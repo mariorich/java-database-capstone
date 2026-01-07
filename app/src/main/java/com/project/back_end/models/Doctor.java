@@ -1,5 +1,6 @@
 package com.project.back_end.models;
 
+@Entity
 public class Doctor {
 
 // @Entity annotation:
