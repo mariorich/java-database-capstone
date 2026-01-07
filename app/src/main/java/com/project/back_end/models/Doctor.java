@@ -1,6 +1,7 @@
 package com.project.back_end.models;
 
 @Entity
+@Table(name = "doctors")
 public class Doctor {
 
 // @Entity annotation:
