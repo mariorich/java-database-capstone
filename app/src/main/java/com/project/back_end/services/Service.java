@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.*;
 import java.util.Optional;
 
-
 @Service
 public class Service {
 
@@ -53,10 +52,10 @@ public class Service {
 
     public ResponseEntity<Map<String, String>> validateAdmin(Admin admin) {
         try {
-            Optional<Admin> existingAdmin = adminRepository.findByEmail(admin.getEmail());
+            Optional<Admin> existingAdmin = adminRepository.findByUsername(admin.getUsername());
             if (existingAdmin.isPresent()) {
                 if (existingAdmin.get().getPassword().equals(admin.getPassword())) {
-                    String token = tokenService.generateToken(admin.getEmail());
+                    String token = tokenService.generateToken(admin.getUsername());
                     Map<String, String> response = new HashMap<>();
                     response.put("token", token);
                     return new ResponseEntity<>(response, HttpStatus.OK);
@@ -68,6 +67,44 @@ public class Service {
             }
         } catch (Exception e) {
             return new ResponseEntity<>(Map.of("error", "Error during admin validation"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Map<String, String>> validatePatientLogin(String username, String password) {
+        try {
+            Optional<Patient> patientOpt = patientRepository.findByUsername(username);
+            if (patientOpt.isPresent()) {
+                Patient patient = patientOpt.get();
+                if (patient.getPassword().equals(password)) {
+                    String token = tokenService.generateToken(username);
+                    return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(Map.of("error", "Invalid password"), HttpStatus.UNAUTHORIZED);
+                }
+            } else {
+                return new ResponseEntity<>(Map.of("error", "Patient not found"), HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("error", "Error during patient login"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Map<String, String>> validateDoctorLogin(String username, String password) {
+        try {
+            Optional<Doctor> doctorOpt = doctorRepository.findByUsername(username);
+            if (doctorOpt.isPresent()) {
+                Doctor doctor = doctorOpt.get();
+                if (doctor.getPassword().equals(password)) {
+                    String token = tokenService.generateToken(username);
+                    return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(Map.of("error", "Invalid password"), HttpStatus.UNAUTHORIZED);
+                }
+            } else {
+                return new ResponseEntity<>(Map.of("error", "Doctor not found"), HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("error", "Error during patient login"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -98,25 +135,6 @@ public class Service {
         Optional<Patient> byEmail = patientRepository.findByEmail(email);
         Optional<Patient> byPhone = patientRepository.findByPhoneNumber(phoneNumber);
         return byEmail.isEmpty() && byPhone.isEmpty();
-    }
-
-    public ResponseEntity<Map<String, String>> validatePatientLogin(String email, String password) {
-        try {
-            Optional<Patient> patientOpt = patientRepository.findByEmail(email);
-            if (patientOpt.isPresent()) {
-                Patient patient = patientOpt.get();
-                if (patient.getPassword().equals(password)) {
-                    String token = tokenService.generateToken(email);
-                    return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>(Map.of("error", "Invalid password"), HttpStatus.UNAUTHORIZED);
-                }
-            } else {
-                return new ResponseEntity<>(Map.of("error", "Patient not found"), HttpStatus.UNAUTHORIZED);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("error", "Error during patient login"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     public List<Appointment> filterPatient(String token, String condition, String doctorName) {
