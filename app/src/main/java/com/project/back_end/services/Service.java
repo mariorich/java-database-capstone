@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Component
 public class Service {
@@ -66,10 +67,10 @@ public class Service {
     @Transactional
     public ResponseEntity<Map<String, String>> validateAdmin(Admin admin) {
         try {
-            Admin existingAdmin = adminRepository.findByUsername(admin.getUsername());
-            if (existingAdmin != null) {
-                if (existingAdmin.getPassword().equals(admin.getPassword())) {
-                    String token = tokenService.generateToken(admin.getUsername());
+            Optional<Admin> existingAdmin = adminRepository.findByEmail(admin.getEmail());
+            if (existingAdmin.isPresent()) {
+                if (existingAdmin.get().getPassword().equals(admin.getPassword())) {
+                    String token = tokenService.generateToken(admin.getEmail());
                     Map<String, String> response = new HashMap<>();
                     response.put("token", token);
                     return new ResponseEntity<>(response, HttpStatus.OK);
@@ -85,12 +86,12 @@ public class Service {
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> validatePatientLogin(String username, String password) {
+    public ResponseEntity<Map<String, String>> validatePatientLogin(String email, String password) {
         try {
-            Patient patient = patientRepository.findByUsername(username);
-            if (patient != null) {
-                if (patient.getPassword().equals(password)) {
-                    String token = tokenService.generateToken(username);
+            Optional<Patient> patient = patientRepository.findByEmail(email);
+            if (patient.isPresent()) {
+                if (patient.get().getPassword().equals(password)) {
+                    String token = tokenService.generateToken(email);
                     return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(Map.of("error", "Invalid password"), HttpStatus.UNAUTHORIZED);
@@ -104,12 +105,13 @@ public class Service {
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> validateDoctorLogin(String username, String password) {
+    public ResponseEntity<Map<String, String>> validateDoctorLogin(String email, String password) {
         try {
-            Doctor doctor = doctorRepository.findByUsername(username);
-            if (doctor != null) {
+            Optional<Doctor> doctorOpt = doctorRepository.findByEmail(email);
+            if (doctorOpt.isPresent()) {
+                Doctor doctor = doctorOpt.get();
                 if (doctor.getPassword().equals(password)) {
-                    String token = tokenService.generateToken(username);
+                    String token = tokenService.generateToken(email);
                     return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(Map.of("error", "Invalid password"), HttpStatus.UNAUTHORIZED);
@@ -135,7 +137,8 @@ public class Service {
         Optional<Doctor> doctorOpt = doctorRepository.findById(doctorId);
         if (doctorOpt.isEmpty()) return -1;
 
-        List<String> availableSlots = doctorService.getDoctorAvaliability(doctorId, appointmentDate);
+        LocalDate date = LocalDate.parse(appointmentDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        List<String> availableSlots = doctorService.getDoctorAvaliability(doctorId, date);
         LocalTime requestedTime = LocalTime.parse(appointmentTime, DateTimeFormatter.ofPattern("HH:mm"));
 
         for (String slotStr : availableSlots) {
@@ -149,33 +152,29 @@ public class Service {
 
     @Transactional
     public boolean validatePatient(String email, String phoneNumber) {
-        Patient patient = patientRepository.findByEmailOrPhone(email, phoneNumber);
-        return patient == null;
+        Optional<Patient> patient = patientRepository.findByEmailOrPhone(email, phoneNumber);
+        return !patient.isPresent();
     }
 
-    public List<AppointmentDTO> filterPatient(String token, String condition, String doctorName) {
-        String username = tokenService.extractUsername(token);
-        if (username == null) return Collections.emptyList();
+    public ResponseEntity<Map<String, Object>> filterPatient(String token, String condition, String doctorName) {
+        String email = tokenService.extractEmail(token);
+        if (email == null) return ResponseEntity.status(401).body(Map.of("error", "Invalid token"));
 
-        Optional<Patient> patientOpt = patientRepository.findByUsername(username);
-        if (patientOpt.isEmpty()) return Collections.emptyList();
+        Optional<Patient> patientOpt = patientRepository.findByEmail(email);
+        if (patientOpt.isEmpty()) return ResponseEntity.status(401).body(Map.of("error", "Patient not found"));
 
         Patient patient = patientOpt.get();
 
-        List<Appointment> appointments;
-        if (condition != null && doctorName != null) {
-            appointments = patientService.filterByDoctorAndCondition(patient.getId(), condition.toLowerCase(), doctorName);
+        if(condition != null && doctorName != null) {
+            return patientService.filterByDoctorAndCondition(patient.getId(), condition, doctorName);
         } else if (condition != null) {
-            appointments = patientService.filterByCondition(patient.getId(), condition.toLowerCase());
+            return patientService.filterByCondition(patient.getId(), condition);
         } else if (doctorName != null) {
-            appointments = patientService.filterByDoctor(patient.getId(), doctorName);
+            return patientService.filterByDoctor(patient.getId(), doctorName);
         } else {
-            appointments = patientService.getAllAppointments(patient.getId());
+            return ResponseEntity.badRequest().body(Map.of("error", "No filter parameters provided"));
         }
-
-        return appointments.stream()
-                .map(AppointmentDTO::new)
-                .toList();
     }
 
 }
+

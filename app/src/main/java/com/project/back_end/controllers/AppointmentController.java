@@ -13,11 +13,11 @@ import com.project.back_end.DTO.Login;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
-    private final Service generalService;
+    private final Service service;
 
-    public AppointmentController(AppointmentService appointmentService, Service generalService) {
+    public AppointmentController(AppointmentService appointmentService, Service service) {
         this.appointmentService = appointmentService;
-        this.generalService = generalService;
+        this.service = service;
     }
 
     // 3. Get appointments by date and patient name
@@ -25,7 +25,7 @@ public class AppointmentController {
     public ResponseEntity<?> getAppointments(@PathVariable String date,
                                              @PathVariable String patientName,
                                              @PathVariable String token) {
-        if (!generalService.validateToken(token, "doctor")) {
+        if (!service.validateToken(token, "doctor")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
         return appointmentService.getAppointmentsByDateAndPatient(date, patientName);
@@ -35,7 +35,7 @@ public class AppointmentController {
     @PostMapping("/{token}")
     public ResponseEntity<?> bookAppointment(@PathVariable String token,
                                              @Valid @RequestBody Appointment appointment) {
-        if (!generalService.validateToken(token, "patient")) {
+        if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
         return appointmentService.bookAppointment(appointment);
@@ -45,7 +45,7 @@ public class AppointmentController {
     @PutMapping("/{token}")
     public ResponseEntity<?> updateAppointment(@PathVariable String token,
                                                @Valid @RequestBody Appointment appointment) {
-        if (!generalService.validateToken(token, "patient")) {
+        if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
         return appointmentService.updateAppointment(appointment);
@@ -55,7 +55,7 @@ public class AppointmentController {
     @DeleteMapping("/{appointmentId}/{token}")
     public ResponseEntity<?> cancelAppointment(@PathVariable Long appointmentId,
                                                @PathVariable String token) {
-        if (!generalService.validateToken(token, "patient")) {
+        if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
         return appointmentService.cancelAppointment(appointmentId);

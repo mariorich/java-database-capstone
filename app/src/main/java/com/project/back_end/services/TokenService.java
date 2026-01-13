@@ -4,14 +4,16 @@ import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
 
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
+import java.util.*;
 
 @Component
 public class TokenService {
@@ -32,19 +34,19 @@ public class TokenService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + 604800000L);
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         try {
             Jws<Claims> claimsJws = Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
@@ -52,24 +54,24 @@ public class TokenService {
                     .parseClaimsJws(token);
             return claimsJws.getBody().getSubject();
         } catch (JwtException e) {
-            return null; // Invalid token
+            return null; 
         }
     }
 
     public boolean isTokenValid(String token, String userType) {
         try {
-            String username = extractUsername(token);
-            if (username == null) {
+            String email = extractEmail(token);
+            if (email == null) {
                 return false;
             }
 
             switch (userType.toLowerCase()) {
                 case "admin":
-                    return adminRepository.findByUsername(username).isPresent();
+                    return adminRepository.findByEmail(email).isPresent();
                 case "doctor":
-                    return doctorRepository.findByUsername(username).isPresent();
+                    return doctorRepository.findByEmail(email).isPresent();
                 case "patient":
-                    return patientRepository.findByUsername(username).isPresent();
+                    return patientRepository.findByEmail(email).isPresent();
                 default:
                     return false;
             }

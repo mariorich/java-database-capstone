@@ -17,30 +17,28 @@ import java.util.Map;
 public class DoctorController {
 
     private final DoctorService doctorService;
-    private final Service generalService;
+    private final Service service;
 
-    public DoctorController(DoctorService doctorService, Service generalService) {
+    public DoctorController(DoctorService doctorService, Service service) {
         this.doctorService = doctorService;
-        this.generalService = generalService;
+        this.service = service;
     }
 
-    // 3. Check doctor availability
     @GetMapping("/availability/{user}/{doctorId}/{date}/{token}")
-    public ResponseEntity<?> getDoctorAvailability(@PathVariable String user,
+    public ResponseEntity<?> getDoctorAvaliability(@PathVariable String user,
                                                    @PathVariable Long doctorId,
                                                    @PathVariable String date,
                                                    @PathVariable String token) {
-        if (!generalService.validateToken(token, user)) {
+        if (!service.validateToken(token, user)) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return doctorService.getDoctorAvailability(doctorId, date);
+        return doctorService.getDoctorAvaliability(doctorId, date);
     }
 
-    // 4. Get all doctors
     @GetMapping
     public ResponseEntity<?> getDoctor() {
         Map<String, Object> response = new HashMap<>();
-        response.put("doctors", doctorService.getAllDoctors());
+        response.put("doctors", doctorService.getDoctors());
         return ResponseEntity.ok(response);
     }
 
@@ -48,7 +46,7 @@ public class DoctorController {
     @PostMapping("/{token}")
     public ResponseEntity<?> saveDoctor(@PathVariable String token,
                                         @Valid @RequestBody Doctor doctor) {
-        if (!generalService.validateToken(token, "admin")) {
+        if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
         return doctorService.saveDoctor(doctor);
@@ -57,14 +55,16 @@ public class DoctorController {
     // 6. Doctor login
     @PostMapping("/login")
     public ResponseEntity<?> doctorLogin(@Valid @RequestBody Login login) {
-        return doctorService.loginDoctor(login);
+        String email = login.getEmail();
+        String password = login.getPassword();
+        return doctorService.validateDoctor(email, password);
     }
 
     // 7. Update existing doctor
     @PutMapping("/{token}")
     public ResponseEntity<?> updateDoctor(@PathVariable String token,
                                           @Valid @RequestBody Doctor doctor) {
-        if (!generalService.validateToken(token, "admin")) {
+        if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
         return doctorService.updateDoctor(doctor);
@@ -74,7 +74,7 @@ public class DoctorController {
     @DeleteMapping("/{doctorId}/{token}")
     public ResponseEntity<?> deleteDoctor(@PathVariable Long doctorId,
                                           @PathVariable String token) {
-        if (!generalService.validateToken(token, "admin")) {
+        if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
         return doctorService.deleteDoctor(doctorId);
@@ -85,6 +85,6 @@ public class DoctorController {
     public ResponseEntity<?> filter(@PathVariable String name,
                                     @PathVariable String time,
                                     @PathVariable String speciality) {
-        return generalService.filterDoctors(name, time, speciality);
+        return service.filterDoctorsByNameSpecialityAndTime(name, speciality,time);
     }
 }

@@ -13,11 +13,11 @@ import com.project.back_end.DTO.Login;
 public class PatientController {
 
     private final PatientService patientService;
-    private final Service generalService;
+    private final Service service;
 
-    public PatientController(PatientService patientService, Service generalService) {
+    public PatientController(PatientService patientService, Service service) {
         this.patientService = patientService;
-        this.generalService = generalService;
+        this.service = service;
     }
 
     // 3. Get patient details
@@ -26,7 +26,7 @@ public class PatientController {
         if (!generalService.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return patientService.getPatientDetails(token);
+        return service.getPatientDetails(token);
     }
 
     // 4. Create a new patient
@@ -46,7 +46,7 @@ public class PatientController {
     // 5. Patient login
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody Login login) {
-        return generalService.validatePatientLogin(login);
+        return service.validatePatientLogin(login);
     }
 
     // 6. Get patient appointments
@@ -54,7 +54,7 @@ public class PatientController {
     public ResponseEntity<?> getPatientAppointment(@PathVariable Long patientId,
                                                    @PathVariable String token,
                                                    @PathVariable String role) {
-        if (!generalService.validateToken(token, role)) {
+        if (!service.validateToken(token, role)) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
         return patientService.getPatientAppointment(patientId);
@@ -65,9 +65,9 @@ public class PatientController {
     public ResponseEntity<?> filterPatientAppointment(@PathVariable String condition,
                                                       @PathVariable String name,
                                                       @PathVariable String token) {
-        if (!generalService.validateToken(token, "patient")) {
+        if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return generalService.filterAppointments(condition, name);
+        return service.filterAppointments(condition, name);
     }
 }

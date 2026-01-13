@@ -1,6 +1,9 @@
 package com.project.back_end.services;
 
 import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Doctor;
+import com.project.back_end.models.Patient;
+import com.project.back_end.services.TokenService;
 import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
@@ -89,7 +92,7 @@ public class AppointmentService {
     @Transactional
     public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
         Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
-        Patient patient = patientRepository.findByUsername(tokenService.extractUsername(token));
+        Patient patient = patientRepository.findByEmail(tokenService.extractEmail(token));
         Long patientId = patient.getId();
         if (appointmentOpt.isPresent()) {
 
@@ -112,8 +115,8 @@ public class AppointmentService {
     }
 
     public Map<String, Object> getAppointment(String pname, LocalDate date, String token) {
-        String username = tokenService.extractUsername(token);
-        Doctor doctor = doctorRepository.findByEmail(username);
+        String email = tokenService.extractEmail(token);
+        Doctor doctor = doctorRepository.findByEmail(email);
         Long doctorId = doctor.getId();
 
         List<Appointment> appointments;

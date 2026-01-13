@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
@@ -32,16 +33,23 @@ public class DoctorService {
     }
 
     public List<String> getDoctorAvaliability(Long doctorId, LocalDate date){
-        Doctor doctor = doctorRepository.findById(doctorId);
+        Optional<Doctor> doctorOpt = doctorRepository.findById(doctorId);
         List<String> availability = new ArrayList<>();
-        if (doctor == null) {
+        if (doctorOpt.isEmpty()) {
             return availability;
         }else{
-            List<TimeSlot> availableTimes = doctor.get().getAvailableTimes();
-            List<String> bookedTimes = appointmentRepository.findBookedTimesByDoctorAndDate(doctorId, date);
+            List<TimeSlot> availableTimes = doctorOpt.get().getAvailableTimes().stream().map(TimeSlot::new).toList();
+            LocalDateTime start = LocalDateTime.of(date, LocalTime.MIDNIGHT);
+            LocalDateTime end = LocalDateTime.of(date, LocalTime.MAX);
+            List<Appointment> appointments = appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(doctorId, start, end);
+            List<String> bookedTimes = new ArrayList<>();
+            for (Appointment appointment : appointments) {
+                String time = appointment.getAppointmentTime().toLocalTime().toString();
+                bookedTimes.add(time);
+            }
 
             for (TimeSlot timeSlot : availableTimes) {
-                String time = timeSlot.getTime();
+                String time = timeSlot.getStartTime();
                 if (!bookedTimes.contains(time)) {
                     availability.add(time);
                 }
@@ -53,8 +61,8 @@ public class DoctorService {
     @Transactional
     public int saveDoctor(Doctor doctor) {
         try{
-            Doctor existingDoctor = doctorRepository.findById(doctor.getId());
-            if(existingDoctor != null){
+            Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
+            if(existingDoctor.isPresent()){
                 return -1; 
             }
             doctorRepository.save(doctor);
@@ -67,8 +75,8 @@ public class DoctorService {
     @Transactional
     public int updateDoctor(Doctor doctor) {
         try{
-            Doctor existingDoctor = doctorRepository.findById(doctor.getId());
-            if(existingDoctor != null){
+            Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
+            if(existingDoctor.isEmpty()){
                 return -1; 
             }
             doctorRepository.save(doctor);
@@ -86,11 +94,11 @@ public class DoctorService {
     @Transactional
     public int deleteDoctor(Long doctorId) {
         try{
-            Doctor existingDoctor = doctorRepository.findById(doctorId);
-            if(existingDoctor != null){
+            Optional<Doctor> existingDoctor = doctorRepository.findById(doctorId);
+            if(existingDoctor.isEmpty()){
                 return -1; 
             }
-            appointmentRepository.deleteByDoctorId(doctorId);
+            appointmentRepository.deleteAllByDoctorId(doctorId);
             doctorRepository.deleteById(doctorId);
             return 1; 
         }catch(Exception e){
@@ -99,133 +107,83 @@ public class DoctorService {
     }
 
     public Map<String, Object> validateDoctor(String email, String password) {
-        Doctor doctor = doctorRepository.findByEmail(email);
-        if (doctor == null) {
+        Optional<Doctor> doctor = doctorRepository.findByEmail(email);
+        if (doctor.isEmpty()) {
             return Map.of("message", "Doctor not found");
         }
-        if (!doctor.getPassword().equals(password)) {
+        if (!doctor.get().getPassword().equals(password)) {
             return Map.of("message", "Invalid password");
         }
-        String token = tokenService.generateToken(doctor.getEmail());
+        String token = tokenService.generateToken(doctor.get().getEmail());
         return Map.of("token", token, "doctor", doctor);
     }
 
     @Transactional
-    public List<Doctor> findDoctorByName(String name) {
+    public Map<String, Object> findDoctorByName(String name) {
         List<Doctor> doctors = doctorRepository.findByNameLike(name);
-        for (Doctor doctor : doctors) {
-            doctor.getAvailableTimes().size(); 
-        }
-        return doctors;
-    }
-
-    @Transactional
-    public List<Doctor> filterDoctorsByNameAndSpecilityAndTime(String name, String specialty, String amOrPm) {
-        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
-        List<Doctor> filteredDoctors = new ArrayList<>();
-        for (Doctor doctor : doctors) {
-            if (doctor.getSpecialty().equalsIgnoreCase(specialty)) {
-                if (doctor.getAvailableTimes().contains(amOrPm)) {
-                    filteredDoctors.add(doctor);
-                }
-            }
-        }
-        return filteredDoctors;
-    }
-
-    // Aditional methods to help
-    private boolean isMorningTime(String time) {
-        LocalTime localTime = LocalTime.parse(time);
-        return localTime.isBefore(LocalTime.NOON);
-    }
-
-    private boolean isAfternoonTime(String time) {
-        LocalTime localTime = LocalTime.parse(time);
-        return localTime.isAfter(LocalTime.NOON) || localTime.equals(LocalTime.NOON);
+        return Map.of("doctors", doctors);
     }
 
     @Transactional
     public List<Doctor> filterDoctorByTime(List<Doctor> doctors, String amOrPm) {
-        List<Doctor> filteredDoctors = new ArrayList<>();
-        for (Doctor doctor : doctors) {
-            for (TimeSlot timeSlot : doctor.getAvailableTimes()) {
-                String time = timeSlot.getTime();
-                if (amOrPm.equalsIgnoreCase("AM") && isMorningTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                } else if (amOrPm.equalsIgnoreCase("PM") && isAfternoonTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                }
-            }
-        }
+        List<Doctor> filteredDoctors = doctors.stream()
+                .filter(doctor -> doctor.getAvailableTimes().stream()
+                        .map(ts -> ts.split("-")[0])       
+                        .map(LocalTime::parse)             
+                        .anyMatch(time -> {
+                            if ("AM".equalsIgnoreCase(amOrPm)) {
+                                return time.isBefore(LocalTime.NOON);
+                            } else if ("PM".equalsIgnoreCase(amOrPm)) {
+                                return !time.isBefore(LocalTime.NOON); 
+                            } else {
+                                return true; 
+                            }
+                        })
+                )
+                .toList(); 
         return filteredDoctors;
     }
 
     @Transactional
-    public List<Doctor> filterDoctorByNameAndTime(String name, String amOrPm) {
+    public Map<String, Object> filterDoctorsByNameSpecialityAndTime(String name, String speciality, String amOrPm) {
+        List<Doctor> doctors = doctorRepository
+                .findByNameContainingIgnoreCaseAndSpecialityIgnoreCase(name, speciality);
+
+        List<Doctor> filteredDoctors = filterDoctorByTime(doctors, amOrPm);
+        return Map.of("doctors", filteredDoctors);
+    }   
+
+    @Transactional
+    public Map<String, Object> filterDoctorByNameAndTime(String name, String amOrPm) {
         List<Doctor> doctors = doctorRepository.findByNameLike(name);
-        List<Doctor> filteredDoctors = new ArrayList<>();
-        for (Doctor doctor : doctors) {
-            for (TimeSlot timeSlot : doctor.getAvailableTimes()) {
-                String time = timeSlot.getTime();
-                if (amOrPm.equalsIgnoreCase("AM") && isMorningTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                } else if (amOrPm.equalsIgnoreCase("PM") && isAfternoonTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                }
-            }
-        }
-        return filteredDoctors;
+        List<Doctor> filteredDoctors = filterDoctorByTime(doctors, amOrPm);
+        return Map.of("doctors", filteredDoctors);
+    }   
+
+    @Transactional
+    public Map<String, Object> filterDoctorByNameAndSpeciality(String name, String speciality) {
+        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCaseAndSpecialityIgnoreCase(name, speciality);
+        return Map.of("doctors", doctors);
     }
 
     @Transactional
-    public List<Doctor> filterDoctorByNameAndSpecility(String name, String specialty) {
-        return doctorRepository.findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
+    public Map<String, Object> filterDoctorByTimeAndSpeciality(String speciality, String amOrPm) {
+        List<Doctor> doctors = doctorRepository.findBySpecialityIgnoreCase(speciality);
+        List<Doctor> filteredDoctors = filterDoctorByTime(doctors, amOrPm); 
+        return Map.of("doctors", filteredDoctors);
     }
 
     @Transactional
-    public List<Doctor> filterDoctorByTimeAndSpecility(String specialty, String amOrPm) {
-        List<Doctor> doctors = doctorRepository.findBySpecialtyIgnoreCase(specialty);
-        List<Doctor> filteredDoctors = new ArrayList<>();
-        for (Doctor doctor : doctors) {
-            for (TimeSlot timeSlot : doctor.getAvailableTimes()) {
-                String time = timeSlot.getTime();
-                if (amOrPm.equalsIgnoreCase("AM") && isMorningTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                } else if (amOrPm.equalsIgnoreCase("PM") && isAfternoonTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                }
-            }
-        }
-        return filteredDoctors;
+    public Map<String, Object> filterDoctorBySpeciality(String speciality) {
+        List<Doctor> doctors = doctorRepository.findBySpecialityIgnoreCase(speciality);
+        return Map.of("doctors", doctors);
     }
 
     @Transactional
-    public List<Doctor> filterDoctorBySpecility(String specialty) {
-        return doctorRepository.findBySpecialtyIgnoreCase(specialty);
+    public Map<String, Object> filterDoctorsByTime(String amOrPm) {
+        List<Doctor> doctors = doctorRepository.findAll();
+        List<Doctor> filteredDoctors = filterDoctorByTime(doctors, amOrPm);
+        return Map.of("doctors", filteredDoctors);
     }
 
-    @Transactional
-    public List<Doctor> filterDoctorsByTime(String amOrPm) {
-        List<Doctor> allDoctors = doctorRepository.findAll();
-        List<Doctor> filteredDoctors = new ArrayList<>();
-        for (Doctor doctor : allDoctors) {
-            for (TimeSlot timeSlot : doctor.getAvailableTimes()) {
-                String time = timeSlot.getTime();
-                if (amOrPm.equalsIgnoreCase("AM") && isMorningTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                } else if (amOrPm.equalsIgnoreCase("PM") && isAfternoonTime(time)) {
-                    filteredDoctors.add(doctor);
-                    break;
-                }
-            }
-        }
-        return filteredDoctors;
-    }
 }

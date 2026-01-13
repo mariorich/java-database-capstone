@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.*;
 public class PrescriptionController {
 
     private final PrescriptionService prescriptionService;
-    private final Service generalService;
+    private final Service service;
     private final AppointmentService appointmentService;
 
     public PrescriptionController(PrescriptionService prescriptionService,
-                                  Service generalService,
+                                  Service service,
                                   AppointmentService appointmentService) {
         this.prescriptionService = prescriptionService;
-        this.generalService = generalService;
+        this.service = service;
         this.appointmentService = appointmentService;
     }
 
@@ -28,7 +28,7 @@ public class PrescriptionController {
     @PostMapping("/{token}")
     public ResponseEntity<?> savePrescription(@PathVariable String token,
                                               @Valid @RequestBody Prescription prescription) {
-        if (!generalService.validateToken(token, "doctor")) {
+        if (!service.validateToken(token, "doctor")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
 
@@ -42,7 +42,7 @@ public class PrescriptionController {
     @GetMapping("/{appointmentId}/{token}")
     public ResponseEntity<?> getPrescription(@PathVariable Long appointmentId,
                                              @PathVariable String token) {
-        if (!generalService.validateToken(token, "doctor")) {
+        if (!service.validateToken(token, "doctor")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
 
