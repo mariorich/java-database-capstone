@@ -1,12 +1,12 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.models.Login;
 import com.project.back_end.models.Patient;
 import com.project.back_end.services.PatientService;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.project.back_end.DTO.Login;
 
 @RestController
 @RequestMapping("/patient")

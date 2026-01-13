@@ -2,8 +2,8 @@ package com.project.back_end.services;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.TimeSlot;
 import com.project.back_end.models.Appointment;
-import com.project.back_end.repositories.AppointmentRepository;
-import com.project.back_end.repositories.DoctorRepository;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.DoctorRepository;
 import org.springframework.stereotype.Service;
 import com.project.back_end.services.TokenService;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +32,9 @@ public class DoctorService {
     }
 
     public List<String> getDoctorAvaliability(Long doctorId, LocalDate date){
-        Optional<Doctor> doctor = doctorRepository.findById(doctorId);
+        Doctor doctor = doctorRepository.findById(doctorId);
         List<String> availability = new ArrayList<>();
-        if (doctor.isEmpty()) {
+        if (doctor == null) {
             return availability;
         }else{
             List<TimeSlot> availableTimes = doctor.get().getAvailableTimes();
@@ -53,8 +53,8 @@ public class DoctorService {
     @Transactional
     public int saveDoctor(Doctor doctor) {
         try{
-            Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
-            if(existingDoctor.isPresent()){
+            Doctor existingDoctor = doctorRepository.findById(doctor.getId());
+            if(existingDoctor != null){
                 return -1; 
             }
             doctorRepository.save(doctor);
@@ -67,8 +67,8 @@ public class DoctorService {
     @Transactional
     public int updateDoctor(Doctor doctor) {
         try{
-            Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
-            if(existingDoctor.isEmpty()){
+            Doctor existingDoctor = doctorRepository.findById(doctor.getId());
+            if(existingDoctor != null){
                 return -1; 
             }
             doctorRepository.save(doctor);
@@ -86,8 +86,8 @@ public class DoctorService {
     @Transactional
     public int deleteDoctor(Long doctorId) {
         try{
-            Optional<Doctor> existingDoctor = doctorRepository.findById(doctorId);
-            if(existingDoctor.isEmpty()){
+            Doctor existingDoctor = doctorRepository.findById(doctorId);
+            if(existingDoctor != null){
                 return -1; 
             }
             appointmentRepository.deleteByDoctorId(doctorId);
@@ -120,7 +120,7 @@ public class DoctorService {
     }
 
     @Transactional
-    public List<Doctor> filterDoctorByNameAndSpecilityAndTime(String name, String specialty, String amOrPm) {
+    public List<Doctor> filterDoctorsByNameAndSpecilityAndTime(String name, String specialty, String amOrPm) {
         List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
         List<Doctor> filteredDoctors = new ArrayList<>();
         for (Doctor doctor : doctors) {

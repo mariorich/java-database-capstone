@@ -1,30 +1,38 @@
 package com.project.back_end.services;
-import org.springframework.stereotype.Service;
-// Model Imports
+
+import org.springframework.stereotype.Component;
+import jakarta.transaction.Transactional;
+
+// Models
 import com.project.back_end.models.Admin;
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Patient;
 import com.project.back_end.models.TimeSlot;
 import com.project.back_end.models.Appointment;
-// Repository Imports
-import com.project.back_end.repositories.AdminRepository;
-import com.project.back_end.repositories.DoctorRepository;
-import com.project.back_end.repositories.PatientRepository;
-// Service Imports
+
+// Repositories
+import com.project.back_end.repo.AdminRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
+
+// Services
 import com.project.back_end.services.TokenService;
 import com.project.back_end.services.PatientService;
 import com.project.back_end.services.DoctorService;
-// Other Imports
+
+// DTO
+import com.project.back_end.DTO.AppointmentDTO;
+
+// Spring & Java
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 import java.util.Optional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import jakarta.transaction.Transactional;
+import java.time.format.DateTimeFormatter;
 
-
-@Service
+@Component
 public class Service {
 
     private final TokenService tokenService;
@@ -34,7 +42,8 @@ public class Service {
     private final PatientService patientService;
     private final DoctorService doctorService;
 
-    public Service(TokenService tokenService, AdminRepository adminRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, PatientService patientService, DoctorService doctorService) {
+    public Service(TokenService tokenService, AdminRepository adminRepository, DoctorRepository doctorRepository,
+                   PatientRepository patientRepository, PatientService patientService, DoctorService doctorService) {
         this.tokenService = tokenService;
         this.adminRepository = adminRepository;
         this.doctorRepository = doctorRepository;
@@ -57,9 +66,9 @@ public class Service {
     @Transactional
     public ResponseEntity<Map<String, String>> validateAdmin(Admin admin) {
         try {
-            Optional<Admin> existingAdmin = adminRepository.findByUsername(admin.getUsername());
-            if (existingAdmin.isPresent()) {
-                if (existingAdmin.get().getPassword().equals(admin.getPassword())) {
+            Admin existingAdmin = adminRepository.findByUsername(admin.getUsername());
+            if (existingAdmin != null) {
+                if (existingAdmin.getPassword().equals(admin.getPassword())) {
                     String token = tokenService.generateToken(admin.getUsername());
                     Map<String, String> response = new HashMap<>();
                     response.put("token", token);
@@ -78,9 +87,8 @@ public class Service {
     @Transactional
     public ResponseEntity<Map<String, String>> validatePatientLogin(String username, String password) {
         try {
-            Optional<Patient> patientOpt = patientRepository.findByUsername(username);
-            if (patientOpt.isPresent()) {
-                Patient patient = patientOpt.get();
+            Patient patient = patientRepository.findByUsername(username);
+            if (patient != null) {
                 if (patient.getPassword().equals(password)) {
                     String token = tokenService.generateToken(username);
                     return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
@@ -98,9 +106,8 @@ public class Service {
     @Transactional
     public ResponseEntity<Map<String, String>> validateDoctorLogin(String username, String password) {
         try {
-            Optional<Doctor> doctorOpt = doctorRepository.findByUsername(username);
-            if (doctorOpt.isPresent()) {
-                Doctor doctor = doctorOpt.get();
+            Doctor doctor = doctorRepository.findByUsername(username);
+            if (doctor != null) {
                 if (doctor.getPassword().equals(password)) {
                     String token = tokenService.generateToken(username);
                     return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
@@ -111,13 +118,13 @@ public class Service {
                 return new ResponseEntity<>(Map.of("error", "Doctor not found"), HttpStatus.UNAUTHORIZED);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("error", "Error during patient login"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(Map.of("error", "Error during doctor login"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     public List<Doctor> filterDoctor(String name, String specialty, String timeSlot) {
         if (name != null && specialty != null && timeSlot != null) {
-            return doctorService.filterByNameSpecialtyAndTimeSlot(name, specialty, timeSlot);
+            return doctorService.filterDoctorsByNameAndSpecilityAndTime(name, specialty, timeSlot);
         } else {
             return doctorRepository.findAll();
         }
@@ -126,54 +133,49 @@ public class Service {
     @Transactional
     public int validateAppointment(Long doctorId, String appointmentDate, String appointmentTime) {
         Optional<Doctor> doctorOpt = doctorRepository.findById(doctorId);
-        if (doctorOpt.isEmpty()) return -1; 
+        if (doctorOpt.isEmpty()) return -1;
 
-        List<TimeSlot> availableSlots = doctorService.getAvailableTimeSlots(doctorId, appointmentDate);
+        List<String> availableSlots = doctorService.getDoctorAvaliability(doctorId, appointmentDate);
+        LocalTime requestedTime = LocalTime.parse(appointmentTime, DateTimeFormatter.ofPattern("HH:mm"));
 
-        String requestedTime;
-        try {
-            LocalTime time = LocalTime.parse(appointmentTime);
-            requestedTime = time.toString();
-        } catch (Exception e) {
-            return 0; 
+        for (String slotStr : availableSlots) {
+            TimeSlot slot = new TimeSlot(slotStr);
+            LocalTime slotStart = LocalTime.parse(slot.getStartTime(), DateTimeFormatter.ofPattern("HH:mm"));
+            if (slotStart.equals(requestedTime)) return 1;
         }
 
-        for (TimeSlot slot : availableSlots) {
-            if (slot.getStartTime().equals(requestedTime)) {
-                return 1; 
-            }
-        }
-        return 0; 
+        return 0;
     }
 
     @Transactional
     public boolean validatePatient(String email, String phoneNumber) {
-        Optional<Patient> byEmail = patientRepository.findByEmail(email);
-        Optional<Patient> byPhone = patientRepository.findByPhoneNumber(phoneNumber);
-        return byEmail.isEmpty() && byPhone.isEmpty();
+        Patient patient = patientRepository.findByEmailOrPhone(email, phoneNumber);
+        return patient == null;
     }
 
-    public List<Appointment> filterPatient(String token, String condition, String doctorName) {
-        String email = tokenService.extractEmail(token);
-        if (email == null) {
-            return Collections.emptyList(); // Invalid token
-        }
+    public List<AppointmentDTO> filterPatient(String token, String condition, String doctorName) {
+        String username = tokenService.extractUsername(token);
+        if (username == null) return Collections.emptyList();
 
-        Optional<Patient> patientOpt = patientRepository.findByEmail(email);
-        if (patientOpt.isEmpty()) {
-            return Collections.emptyList(); // Patient not found
-        }
+        Optional<Patient> patientOpt = patientRepository.findByUsername(username);
+        if (patientOpt.isEmpty()) return Collections.emptyList();
 
         Patient patient = patientOpt.get();
 
+        List<Appointment> appointments;
         if (condition != null && doctorName != null) {
-            return patientService.filterByConditionAndDoctor(patient.getId(), condition, doctorName);
+            appointments = patientService.filterByDoctorAndCondition(patient.getId(), condition.toLowerCase(), doctorName);
         } else if (condition != null) {
-            return patientService.filterByCondition(patient.getId(), condition);
+            appointments = patientService.filterByCondition(patient.getId(), condition.toLowerCase());
         } else if (doctorName != null) {
-            return patientService.filterByDoctor(patient.getId(), doctorName);
+            appointments = patientService.filterByDoctor(patient.getId(), doctorName);
         } else {
-            return patientService.getAllAppointments(patient.getId());
+            appointments = patientService.getAllAppointments(patient.getId());
         }
+
+        return appointments.stream()
+                .map(AppointmentDTO::new)
+                .toList();
     }
+
 }

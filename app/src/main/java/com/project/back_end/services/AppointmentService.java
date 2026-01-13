@@ -1,9 +1,9 @@
 package com.project.back_end.services;
 
 import com.project.back_end.models.Appointment;
-import com.project.back_end.repositories.AppointmentRepository;
-import com.project.back_end.repositories.DoctorRepository;
-import com.project.back_end.repositories.PatientRepository;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -117,7 +117,7 @@ public class AppointmentService {
         Long doctorId = doctor.getId();
 
         List<Appointment> appointments;
-        if (pname != null && !pname.isEmpty()) {
+        if (pname != null) {
             appointments = appointmentRepository.findByDoctorIdAndPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
                             doctorId, pname, date.atStartOfDay(), date.atStartOfDay().plusDays(1));
         } else {

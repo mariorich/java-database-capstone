@@ -1,7 +1,7 @@
 package com.project.back_end.services;
 
 import com.project.back_end.models.Prescription;
-import com.project.back_end.repositories.PrescriptionRepository;
+import com.project.back_end.repo.PrescriptionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,8 +23,8 @@ public class PrescriptionService {
     @Transactional
     public ResponseEntity<?> savePrescription(Prescription prescription) {
         try {
-            Optional<Prescription> existing = prescriptionRepository.findByAppointmentId(prescription.getAppointmentId());
-            if (existing.isPresent()) {
+            Prescription existing = prescriptionRepository.findByAppointmentId(prescription.getAppointmentId());
+            if (existing != null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Prescription already exists for this appointment.");
             }
@@ -41,8 +41,8 @@ public class PrescriptionService {
     @Transactional
     public ResponseEntity<?> getPrescription(Long appointmentId) {
         try {
-            Optional<Prescription> prescription = prescriptionRepository.findByAppointmentId(appointmentId);
-            if (prescription.isEmpty()) {
+            Prescription prescription = prescriptionRepository.findByAppointmentId(appointmentId);
+            if (prescription == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("No prescription found for this appointment.");
             }
