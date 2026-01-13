@@ -92,8 +92,8 @@ public class AppointmentService {
     @Transactional
     public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
         Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
-        Patient patient = patientRepository.findByEmail(tokenService.extractEmail(token));
-        Long patientId = patient.getId();
+        Optional<Patient> patient = patientRepository.findByEmail(tokenService.extractEmail(token));
+        Long patientId = patient.get().getId();
         if (appointmentOpt.isPresent()) {
 
             if (!appointmentOpt.get().getPatient().getId().equals(patientId)) {
@@ -114,18 +114,18 @@ public class AppointmentService {
         }
     }
 
-    public Map<String, Object> getAppointment(String pname, LocalDate date, String token) {
+    public Map<String, Object> getAppointment(String pname, String date, String token) {
         String email = tokenService.extractEmail(token);
-        Doctor doctor = doctorRepository.findByEmail(email);
-        Long doctorId = doctor.getId();
-
+        Optional<Doctor> doctorOpt = doctorRepository.findByEmail(email);
+        Long doctorId = doctorOpt.get().getId();
+        LocalDate localDate = LocalDate.parse(date);
         List<Appointment> appointments;
         if (pname != null) {
             appointments = appointmentRepository.findByDoctorIdAndPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
-                            doctorId, pname, date.atStartOfDay(), date.atStartOfDay().plusDays(1));
+                            doctorId, pname, localDate.atStartOfDay(), localDate.atStartOfDay().plusDays(1));
         } else {
             appointments = appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(
-                    doctorId, date.atStartOfDay(), date.atStartOfDay().plusDays(1));
+                    doctorId, localDate.atStartOfDay(), localDate.atStartOfDay().plusDays(1));
         }
 
         Map<String, Object> response = new HashMap<>();

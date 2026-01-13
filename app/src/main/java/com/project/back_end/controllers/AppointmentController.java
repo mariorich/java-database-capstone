@@ -4,6 +4,9 @@ import com.project.back_end.models.Appointment;
 import com.project.back_end.services.AppointmentService;
 import com.project.back_end.services.Service;
 import jakarta.validation.Valid;
+
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.project.back_end.DTO.Login;
@@ -28,7 +31,8 @@ public class AppointmentController {
         if (!service.validateToken(token, "doctor")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return appointmentService.getAppointmentsByDateAndPatient(date, patientName);
+        Map<String, Object> response = appointmentService.getAppointment(patientName, date, token);
+        return ResponseEntity.ok().body(response);
     }
 
     // 4. Book a new appointment
@@ -38,7 +42,7 @@ public class AppointmentController {
         if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return appointmentService.bookAppointment(appointment);
+        return appointmentService.bookAppointment(appointment, token);
     }
 
     // 5. Update an existing appointment
@@ -48,7 +52,7 @@ public class AppointmentController {
         if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return appointmentService.updateAppointment(appointment);
+        return appointmentService.updateAppointment(appointment, token);
     }
 
     // 6. Cancel an appointment
@@ -58,7 +62,7 @@ public class AppointmentController {
         if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return appointmentService.cancelAppointment(appointmentId);
+        return appointmentService.cancelAppointment(appointmentId, token);
     }
 }
 

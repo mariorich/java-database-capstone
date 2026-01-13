@@ -53,14 +53,14 @@ public class Service {
         this.doctorService = doctorService;
     }
 
-    public ResponseEntity<String> validateToken(String token, String userType) {
+    public boolean validateToken(String token, String userType) {
         try {
             if (!tokenService.isTokenValid(token, userType)) {
-                return new ResponseEntity<>("Invalid or expired token", HttpStatus.UNAUTHORIZED);
+                return false;
             }
-            return new ResponseEntity<>("", HttpStatus.OK);
+            return true;
         } catch (Exception e) {
-            return new ResponseEntity<>("Error validating token", HttpStatus.INTERNAL_SERVER_ERROR);
+            return false;
         }
     }
 
@@ -124,19 +124,17 @@ public class Service {
         }
     }
 
-    public List<Doctor> filterDoctor(String name, String specialty, String timeSlot) {
-        if (name != null && specialty != null && timeSlot != null) {
-            return doctorService.filterDoctorsByNameAndSpecilityAndTime(name, specialty, timeSlot);
-        } else {
-            return doctorRepository.findAll();
-        }
+    public ResponseEntity<Map<String, Object>> filterDoctor(String name, String specialty, String timeSlot) {
+        Map<String, Object> response = doctorService.filterDoctorsByNameSpecialityAndTime(name, specialty, timeSlot);
+        return ResponseEntity.ok().body(response);
     }
 
     @Transactional
     public int validateAppointment(Long doctorId, String appointmentDate, String appointmentTime) {
         Optional<Doctor> doctorOpt = doctorRepository.findById(doctorId);
-        if (doctorOpt.isEmpty()) return -1;
-
+        if (doctorOpt.isEmpty()){
+            return -1;
+        }
         LocalDate date = LocalDate.parse(appointmentDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         List<String> availableSlots = doctorService.getDoctorAvaliability(doctorId, date);
         LocalTime requestedTime = LocalTime.parse(appointmentTime, DateTimeFormatter.ofPattern("HH:mm"));

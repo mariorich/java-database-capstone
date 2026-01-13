@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.project.back_end.DTO.Login;
 
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,12 +29,13 @@ public class DoctorController {
     @GetMapping("/availability/{user}/{doctorId}/{date}/{token}")
     public ResponseEntity<?> getDoctorAvaliability(@PathVariable String user,
                                                    @PathVariable Long doctorId,
-                                                   @PathVariable String date,
+                                                   @PathVariable LocalDate date,
                                                    @PathVariable String token) {
         if (!service.validateToken(token, user)) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return doctorService.getDoctorAvaliability(doctorId, date);
+        List<String> slots = doctorService.getDoctorAvaliability(doctorId, date);
+        return ResponseEntity.ok().body(Map.of(doctorId, slots));
     }
 
     @GetMapping
@@ -49,7 +52,14 @@ public class DoctorController {
         if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
-        return doctorService.saveDoctor(doctor);
+        int result = doctorService.saveDoctor(doctor, token);
+        if(result == 1){
+            return ResponseEntity.ok().body(Map.of("message", "Doctor saved successfully"));
+        }else if (result == -1){
+            return ResponseEntity.status(400).body(Map.of("message", "Doctor already exists"));    
+        }else{
+            return ResponseEntity.status(500).body(Map.of("message", "Some internal error occurred"));
+        }
     }
 
     // 6. Doctor login
@@ -67,7 +77,7 @@ public class DoctorController {
         if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
-        return doctorService.updateDoctor(doctor);
+        return doctorService.updateDoctor(doctor, token);
     }
 
     // 8. Delete doctor by ID
@@ -77,7 +87,7 @@ public class DoctorController {
         if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
-        return doctorService.deleteDoctor(doctorId);
+        return doctorService.deleteDoctor(doctorId, token);
     }
 
     // 9. Filter doctors

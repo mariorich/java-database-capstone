@@ -59,7 +59,11 @@ public class DoctorService {
     }
 
     @Transactional
-    public int saveDoctor(Doctor doctor) {
+    public int saveDoctor(Doctor doctor, String token) {
+        if (!tokenService.isTokenValid(token, "doctor") 
+            || !tokenService.isTokenValid(token, "admin")) {
+            return 0; 
+        }
         try{
             Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
             if(existingDoctor.isPresent()){
@@ -73,7 +77,11 @@ public class DoctorService {
     }   
 
     @Transactional
-    public int updateDoctor(Doctor doctor) {
+    public int updateDoctor(Doctor doctor, String token) {
+        if (!tokenService.isTokenValid(token, "doctor") 
+            || !tokenService.isTokenValid(token, "admin")) {
+            return 0; 
+        }
         try{
             Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
             if(existingDoctor.isEmpty()){
@@ -92,7 +100,11 @@ public class DoctorService {
     }
 
     @Transactional
-    public int deleteDoctor(Long doctorId) {
+    public int deleteDoctor(Long doctorId, String token) {
+        if (!tokenService.isTokenValid(token, "doctor") 
+            || !tokenService.isTokenValid(token, "admin")) {
+            return 0; 
+        }
         try{
             Optional<Doctor> existingDoctor = doctorRepository.findById(doctorId);
             if(existingDoctor.isEmpty()){
