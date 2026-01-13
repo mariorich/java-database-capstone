@@ -23,16 +23,16 @@ public class PatientController {
     // 3. Get patient details
     @GetMapping("/{token}")
     public ResponseEntity<?> getPatient(@PathVariable String token) {
-        if (!generalService.validateToken(token, "patient")) {
+        if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return service.getPatientDetails(token);
+        return patientService.getPatientDetails(token);
     }
 
     // 4. Create a new patient
     @PostMapping
     public ResponseEntity<?> createPatient(@Valid @RequestBody Patient patient) {
-        if (generalService.patientExists(patient.getEmail())) {
+        if (service.validatePatient(patient.getEmail(), patient.getPhone())) {
             return ResponseEntity.status(409).body("Patient already exists");
         }
         int result = patientService.createPatient(patient);
@@ -46,7 +46,9 @@ public class PatientController {
     // 5. Patient login
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody Login login) {
-        return service.validatePatientLogin(login);
+        String email = login.getEmail();
+        String password = login.getPassword();
+        return service.validatePatientLogin(email, password);
     }
 
     // 6. Get patient appointments
@@ -63,11 +65,11 @@ public class PatientController {
     // 7. Filter patient appointments
     @GetMapping("/appointments/filter/{condition}/{name}/{token}")
     public ResponseEntity<?> filterPatientAppointment(@PathVariable String condition,
-                                                      @PathVariable String name,
+                                                      @PathVariable Long name,
                                                       @PathVariable String token) {
         if (!service.validateToken(token, "patient")) {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
-        return service.filterAppointments(condition, name);
+        return patientService.filterByCondition(name, condition);
     }
 }

@@ -16,8 +16,7 @@ private final Service service;
 
     @GetMapping("/adminDashboard/{token}")
     public String adminDashboard(@PathVariable("token") String token) {
-        String error = service.validateToken(token, "admin");
-        if (error.isEmpty()) {
+        if (service.validateToken(token, "admin")) {
             return "admin/adminDashboard";
         } else {
             return "redirect:/";
@@ -26,8 +25,7 @@ private final Service service;
 
     @GetMapping("/doctorDashboard/{token}")
     public String doctorDashboard(@PathVariable("token") String token) {
-        String error = service.validateToken(token, "doctor");
-        if (error.isEmpty()) {
+        if (service.validateToken(token, "doctor")) {
             return "doctor/doctorDashboard";
         } else {
             return "redirect:/";

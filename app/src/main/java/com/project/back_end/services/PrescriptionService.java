@@ -48,7 +48,7 @@ public class PrescriptionService {
             }
 
             Map<String, Object> response = new HashMap<>();
-            response.put("prescription", prescription.get());
+            response.put("prescription", prescription);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

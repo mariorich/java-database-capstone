@@ -32,9 +32,6 @@ public class PrescriptionController {
             return ResponseEntity.status(401).body("Invalid or expired token");
         }
 
-        // Update appointment status before saving the prescription
-        appointmentService.markPrescriptionAdded(prescription.getAppointmentId());
-
         return prescriptionService.savePrescription(prescription);
     }
 

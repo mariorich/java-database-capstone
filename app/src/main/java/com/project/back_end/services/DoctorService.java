@@ -7,6 +7,8 @@ import com.project.back_end.repo.DoctorRepository;
 import org.springframework.stereotype.Service;
 import com.project.back_end.services.TokenService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -118,16 +120,16 @@ public class DoctorService {
         }
     }
 
-    public Map<String, Object> validateDoctor(String email, String password) {
+    public ResponseEntity<Map<String, Object>> validateDoctor(String email, String password) {
         Optional<Doctor> doctor = doctorRepository.findByEmail(email);
         if (doctor.isEmpty()) {
-            return Map.of("message", "Doctor not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Doctor not found"));
         }
         if (!doctor.get().getPassword().equals(password)) {
-            return Map.of("message", "Invalid password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid password"));
         }
         String token = tokenService.generateToken(doctor.get().getEmail());
-        return Map.of("token", token, "doctor", doctor);
+        return ResponseEntity.ok(Map.of("token", token, "doctor", doctor));
     }
 
     @Transactional

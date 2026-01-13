@@ -77,7 +77,14 @@ public class DoctorController {
         if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
-        return doctorService.updateDoctor(doctor, token);
+        int result = doctorService.updateDoctor(doctor, token);
+        if(result == 1){
+            return ResponseEntity.ok().body(Map.of("message", "Doctor updated successfully"));
+        }else if (result == -1){
+            return ResponseEntity.status(400).body(Map.of("message", "Doctor not found"));    
+        }else{
+            return ResponseEntity.status(500).body(Map.of("message", "Some internal error occurred"));
+        }
     }
 
     // 8. Delete doctor by ID
@@ -87,7 +94,14 @@ public class DoctorController {
         if (!service.validateToken(token, "admin")) {
             return ResponseEntity.status(401).body("Unauthorized access");
         }
-        return doctorService.deleteDoctor(doctorId, token);
+        int result = doctorService.deleteDoctor(doctorId, token);
+        if(result == 1){
+            return ResponseEntity.ok().body(Map.of("message", "Doctor deleted successfully"));
+        }else if (result == -1){
+            return ResponseEntity.status(400).body(Map.of("message", "Doctor not found"));    
+        }else{
+            return ResponseEntity.status(500).body(Map.of("message", "Some internal error occurred"));
+        }
     }
 
     // 9. Filter doctors
@@ -95,6 +109,6 @@ public class DoctorController {
     public ResponseEntity<?> filter(@PathVariable String name,
                                     @PathVariable String time,
                                     @PathVariable String speciality) {
-        return service.filterDoctorsByNameSpecialityAndTime(name, speciality,time);
+        return service.filterDoctor(name, speciality,time);
     }
 }
