@@ -18,7 +18,7 @@ public class TimeSlot {
         this.times = times;
     }
 
-    public getStartTime() {
+    public String getStartTime() {
         return times.split("-")[0];
     }
 }

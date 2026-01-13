@@ -1,6 +1,7 @@
 package com.project.back_end.DTO;
-import java.time.*;
 
+import com.project.back_end.models.Appointment;
+import java.time.*;
 
 public class AppointmentDTO {
     private long id;
@@ -16,9 +17,10 @@ public class AppointmentDTO {
     private LocalDate appointmentDate;
     private LocalTime appointmentTimeOnly;
     private LocalDateTime endTime;
-    // Constructor
+
     public AppointmentDTO() {
     }
+
     public AppointmentDTO(long id, Long doctorId, String doctorName, Long patientId, String patientName,
                           String patientEmail, String patientPhone, String patientAddress,
                           LocalDateTime appointmentTime, int status) {
@@ -34,10 +36,26 @@ public class AppointmentDTO {
         this.status = status;
         this.appointmentDate = appointmentTime.toLocalDate();
         this.appointmentTimeOnly = appointmentTime.toLocalTime();
-        this.endTime = appointmentTime.plusHours(1); 
+        this.endTime = appointmentTime.plusHours(1);
     }
 
-    // Getters:
+    // Mapper to use in the service
+    public static AppointmentDTO fromEntity(Appointment appointment) {
+        return new AppointmentDTO(
+                appointment.getId(),
+                appointment.getDoctor().getId(),
+                appointment.getDoctor().getName(),
+                appointment.getPatient().getId(),
+                appointment.getPatient().getName(),
+                appointment.getPatient().getEmail(),
+                appointment.getPatient().getPhone(),
+                appointment.getPatient().getAddress(),
+                appointment.getAppointmentTime(),
+                appointment.getStatus()
+        );
+    }
+
+    // Getters
     public long getId() { return id; }
     public Long getDoctorId() { return doctorId; }
     public String getDoctorName() { return doctorName; }
@@ -51,5 +69,4 @@ public class AppointmentDTO {
     public LocalDate getAppointmentDate() { return appointmentDate; }
     public LocalTime getAppointmentTimeOnly() { return appointmentTimeOnly; }
     public LocalDateTime getEndTime() { return endTime; }
-
 }

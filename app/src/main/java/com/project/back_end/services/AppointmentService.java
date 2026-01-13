@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AppointmentService {
@@ -35,6 +37,7 @@ public class AppointmentService {
         this.service = service;
     }
 
+    @Transactional
     public ResponseEntity<Map<String, String>> bookAppointment(Appointment appointment, String token) {
     try {
         appointmentRepository.save(appointment);
@@ -44,7 +47,8 @@ public class AppointmentService {
                              .body(Map.of("message", "Failed to book appointment"));
     }
     }
-         
+     
+    @Transactional
     public ResponseEntity<Map<String,String>> updateAppointment(Appointment appointment,String token) {
         Appointment existingAppointment = appointmentRepository.findById(appointment.getId()).orElse(null);
         if(existingAppointment != null){
@@ -82,6 +86,7 @@ public class AppointmentService {
         }
     }
 
+    @Transactional
     public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
         Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
         Patient patient = patientRepository.findByUsername(tokenService.extractUsername(token));

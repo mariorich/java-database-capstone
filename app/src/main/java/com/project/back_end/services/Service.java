@@ -19,6 +19,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import jakarta.transaction.Transactional;
+
 
 @Service
 public class Service {
@@ -50,6 +54,7 @@ public class Service {
         }
     }
 
+    @Transactional
     public ResponseEntity<Map<String, String>> validateAdmin(Admin admin) {
         try {
             Optional<Admin> existingAdmin = adminRepository.findByUsername(admin.getUsername());
@@ -70,6 +75,7 @@ public class Service {
         }
     }
 
+    @Transactional
     public ResponseEntity<Map<String, String>> validatePatientLogin(String username, String password) {
         try {
             Optional<Patient> patientOpt = patientRepository.findByUsername(username);
@@ -89,6 +95,7 @@ public class Service {
         }
     }
 
+    @Transactional
     public ResponseEntity<Map<String, String>> validateDoctorLogin(String username, String password) {
         try {
             Optional<Doctor> doctorOpt = doctorRepository.findByUsername(username);
@@ -116,21 +123,30 @@ public class Service {
         }
     }
 
+    @Transactional
     public int validateAppointment(Long doctorId, String appointmentDate, String appointmentTime) {
         Optional<Doctor> doctorOpt = doctorRepository.findById(doctorId);
-        if (doctorOpt.isPresent()) {
-            List<TimeSlot> availableSlots = doctorService.getAvailableTimeSlots(doctorId, appointmentDate);
-            for (TimeSlot slot : availableSlots) {
-                if (slot.getStartTime().equals(appointmentTime)) {
-                    return 1; // Valid appointment time
-                }
-            }
-            return 0; // Invalid appointment time
-        } else {
-            return -1; // Doctor does not exist
+        if (doctorOpt.isEmpty()) return -1; 
+
+        List<TimeSlot> availableSlots = doctorService.getAvailableTimeSlots(doctorId, appointmentDate);
+
+        String requestedTime;
+        try {
+            LocalTime time = LocalTime.parse(appointmentTime);
+            requestedTime = time.toString();
+        } catch (Exception e) {
+            return 0; 
         }
+
+        for (TimeSlot slot : availableSlots) {
+            if (slot.getStartTime().equals(requestedTime)) {
+                return 1; 
+            }
+        }
+        return 0; 
     }
 
+    @Transactional
     public boolean validatePatient(String email, String phoneNumber) {
         Optional<Patient> byEmail = patientRepository.findByEmail(email);
         Optional<Patient> byPhone = patientRepository.findByPhoneNumber(phoneNumber);
