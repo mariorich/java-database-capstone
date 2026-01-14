@@ -9,7 +9,7 @@ import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
@@ -87,6 +87,9 @@ public class AppointmentService {
             response.put("message","Appointment not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+        Map<String,String> response = new HashMap<>();
+        response.put("message","An error has occurred");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @Transactional

@@ -17,9 +17,9 @@ public class Doctor {
     @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters")
     private String name;
 
-    @NotNull(message = "Specialty cannot be null")
-    @Size(min = 3, max = 50, message = "Specialty must be between 3 and 50 characters")
-    private String specialty;
+    @NotNull(message = "Speciality cannot be null")
+    @Size(min = 3, max = 50, message = "Speciality must be between 3 and 50 characters")
+    private String speciality;
 
     @NotNull(message = "Email cannot be null")
     @Email(message = "Email should be valid")
@@ -41,9 +41,9 @@ public class Doctor {
     public Doctor() {
     }
 
-    public Doctor(String name, String specialty, String email, String password, String phone, List<String> availableTimes) {
+    public Doctor(String name, String speciality, String email, String password, String phone, List<String> availableTimes) {
         this.name = name;
-        this.specialty = specialty;
+        this.speciality = speciality;
         this.email = email;
         this.password = password;
         this.phone = phone;
@@ -63,12 +63,12 @@ public class Doctor {
         this.name = name;
     }
 
-    public String getSpecialty() {
-        return specialty;
+    public String getspeciality() {
+        return speciality;
     }
 
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
+    public void setspeciality(String speciality) {
+        this.speciality = speciality;
     }
 
     public String getEmail() {

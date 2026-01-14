@@ -4,7 +4,7 @@ import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwts.*;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
@@ -48,7 +48,7 @@ public class TokenService {
 
     public String extractEmail(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parserBuilder()
+            Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token);

@@ -8,7 +8,7 @@ import com.project.back_end.repo.PatientRepository;
 import com.project.back_end.services.TokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.HashMap;
 
-@Service
+@Component
 public class PatientService {
 
     private final PatientRepository patientRepository;

@@ -4,7 +4,7 @@ import com.project.back_end.models.TimeSlot;
 import com.project.back_end.models.Appointment;
 import com.project.back_end.repo.AppointmentRepository;
 import com.project.back_end.repo.DoctorRepository;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import com.project.back_end.services.TokenService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
-@Service
+@Component
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
