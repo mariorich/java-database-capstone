@@ -1,6 +1,6 @@
 // adminDashboard.js
 
-import { openModal } from './modal.js';
+import { openModal } from './components/modal.js';
 import { getDoctors, filterDoctors, saveDoctor } from './doctorServices.js';
 import { createDoctorCard } from './doctorCard.js';
 
