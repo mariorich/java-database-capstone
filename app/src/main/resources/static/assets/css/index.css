@@ -1,140 +1,86 @@
-/* Wrapper layout */
+/* this is the style sheet file for index.htlm  */
+
+/* 
+**Global Reset (`*`)**
+* {margin: 0; padding: 0; box-sizing: border-box;}
+
+
+**Base (`html, body`)**
+
+html, body {
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+}
+
+**Layout Wrapper (`.wrapper`)**
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Heading */
-h2 {
-  font-size: 48px;
-  font-weight: bold;
-  color: #003e3e;
-  font-family: 'Alegreya', 'Roboto', sans-serif;
-  text-align: center;
-  margin-bottom: 50px;
+**Heading (`h2`)**
+.h2 {
+    font-size: 48px;
+    margin-bottom: 50px;
+    color: #003e3e;
+    font-weight: bold;
+    font-family: 'Alegreya', 'Roboto', sans-serif;
 }
 
-/* Main content */
+**Main Section (`.main-content`)**
 .main-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 40px;
-  background-image: url('index.png'); /* replace with your image */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+    flex-grow: 1;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    background-image: url('../images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
-
-/* Buttons */
 button {
-  background-color: #015c5d;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 20px;
-  width: 200px;
-  margin-top: 10px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+    background-color: #015c5d;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    width: 200px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 16px;
 }
-
 button:hover {
-  background-color: #A62B1F;
+    background-color: #A62B1F;
 }
+**Buttons (`button`)**
 
-/* Dashboard buttons */
-.dashboard-btn {
-  background-color: #015c5d;
+**Dashboard Buttons (`.dashboard-btn`)**
+dashboard-btn {
+    background-color: #015c5d;
 }
-
 .dashboard-btn:hover {
-  background-color: #003e3e;
+    background-color: #003e3e;
 }
-
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close:hover {
-  color: #A62B1F;
-}
-
-/* Footer */
 .footer {
-  display: flex;
-  justify-content: space-between;
-  padding: 20px;
-  flex-wrap: wrap;
+    display: flex;
+    background-color: #003e3e;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
 }
-
-/* Header */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  flex-wrap: wrap;
-}
-
-/* Inputs and select fields */
-.input-field, .select-dropdown {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  width: 100%;
-  margin-bottom: 15px;
-  font-size: 16px;
-}
-
-.input-field:focus, .select-dropdown:focus {
-  border-color: #015c5d;
-  outline: none;
-}
-
-/* Checkbox group */
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Hover and interaction effects */
-button, .input-field, .select-dropdown {
-  transition: all 0.3s ease;
+    background-color: #003e3e;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
 }

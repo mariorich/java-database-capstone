@@ -1,47 +1,42 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/assets/images/logo/logo.png" />
-    <title>Index</title>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="/assets/css/index.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-
-    <!-- JS -->
-    <script type="module" src="/js/render.js" defer></script>
-    <script type="module" src="/js/components/header.js" defer></script>
-    <script type="module" src="/js/components/footer.js" defer></script>
-    <script type="module" src="/js/addPrescription.js" defer></script>
-    <script type="module" src="/js/services/modal.js" defer></script>
+    <title>Select Role</title>
+    <link rel="icon" type="image/png" href="../assets/images/logo/Logo.png" />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../assets/css/index.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <!-- JavaScript Files -->
+    <script src="../js/util.js" defer></script>
+    <script src="../js/render.js" defer></script>
+    <script src="../js/components/header.js" defer></script>
+    <script src="../js/components/footer.js" defer></script>
 </head>
-
 <body>
     <div class="container">
         <div class="wrapper">
             <div id="header"></div>
-
-            <div class="main-content">
+            <main>
                 <h2>Select Your Role</h2>
-                <button class="btn-primary" id="adminLogin">Admin</button>
-                <button class="btn-primary" id="doctorLogin">Doctor</button>
-                <button class="btn-primary" id="patientLogin">Patient</button>
-
-                <!-- Modal -->
-                <div id="modal" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <span id="closeModal" class="close-button">&times;</span>
-                        <div id="modal-body">
-                            <!-- Dynamic content will appear here -->
-                        </div>
-                    </div>
+                <div class="role-buttons">
+                    <button id="adminBtn" onclick="selectRole('admin')">Admin</button>
+                    <button id="patientBtn" onclick="selectRole('patient')">Patient</button>
+                    <button id="doctorBtn" onclick="selectRole('doctor')">Doctor</button>
                 </div>
-            </div>
-
+            </main>
             <div id="footer"></div>
         </div>
     </div>
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button id="closeModal">&times;</button>
+            <div id="modal-body">
+                <!-- Modal content will be injected here -->
+            </div>
+        </div>
+    </div>
+    <script type="module" src="../js/pages/index.js" defer></script>
 </body>
 </html>
