@@ -35,7 +35,7 @@ h2 {
   display: flex;
   flex-direction: column;
   text-align: center;
-  background-image: url("/assets/images/backgrounds/index.png");
+  background-image: url('/assets/images/defineRole/index.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
