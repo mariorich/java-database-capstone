@@ -24,24 +24,29 @@ export function openModal(type) {
 
         </select>
         <input type="email" id="doctorEmail" placeholder="Email" class="input-field">
+        <input type="text" id="doctorUsername" placeholder="Username" class="input-field">
         <input type="password" id="doctorPassword" placeholder="Password" class="input-field">
         <input type="text" id="doctorPhone" placeholder="Mobile No." class="input-field">
         <div class="availability-container">
         <label class="availabilityLabel">Select Availability:</label>
-          <div class="checkbox-group">
+          <div class="checkbox-group" id="doctorAvailableTimes">
               <label><input type="checkbox" name="availability" value="09:00-10:00"> 9:00 AM - 10:00 AM</label>
               <label><input type="checkbox" name="availability" value="10:00-11:00"> 10:00 AM - 11:00 AM</label>
               <label><input type="checkbox" name="availability" value="11:00-12:00"> 11:00 AM - 12:00 PM</label>
               <label><input type="checkbox" name="availability" value="12:00-13:00"> 12:00 PM - 1:00 PM</label>
+              <label><input type="checkbox" name="availability" value="13:00-14:00"> 1:00 PM - 2:00 PM</label>
+              <label><input type="checkbox" name="availability" value="14:00-15:00"> 2:00 PM - 3:00 PM</label>
+              <label><input type="checkbox" name="availability" value="15:00-16:00"> 3:00 PM - 4:00 PM</label>
+              <label><input type="checkbox" name="availability" value="16:00-17:00"> 4:00 PM - 5:00 PM</label>
           </div>
         </div>
-        <button class="dashboard-btn" id="saveDoctorBtn">Save</button>
+        <button class="dashboard-btn" id="addDoctorBtn">Save</button>
       `;
   } else if (type === 'patientLogin') {
     modalContent = `
         <h2>Patient Login</h2>
-        <input type="text" id="email" placeholder="Email" class="input-field">
-        <input type="password" id="password" placeholder="Password" class="input-field">
+        <input type="text" id="patientEmail" placeholder="Email" class="input-field">
+        <input type="password" id="patientPassword" placeholder="Password" class="input-field">
         <button class="dashboard-btn" id="loginBtn">Login</button>
       `;
   }
@@ -59,15 +64,15 @@ export function openModal(type) {
   } else if (type === 'adminLogin') {
     modalContent = `
         <h2>Admin Login</h2>
-        <input type="text" id="username" name="username" placeholder="Username" class="input-field">
-        <input type="password" id="password" name="password" placeholder="Password" class="input-field">
+        <input type="email" id="adminEmail" placeholder="Email" class="input-field">
+        <input type="password" id="adminPassword" name="password" placeholder="Password" class="input-field">
         <button class="dashboard-btn" id="adminLoginBtn" >Login</button>
       `;
   } else if (type === 'doctorLogin') {
     modalContent = `
         <h2>Doctor Login</h2>
-        <input type="text" id="email" placeholder="Email" class="input-field">
-        <input type="password" id="password" placeholder="Password" class="input-field">
+        <input type="email" id="doctorEmail" placeholder="Email" class="input-field">
+        <input type="password" id="doctorPassword" placeholder="Password" class="input-field">
         <button class="dashboard-btn" id="doctorLoginBtn" >Login</button>
       `;
   }
