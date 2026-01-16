@@ -4,26 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Select Role</title>
-    <link rel="icon" type="image/png" href="../assets/images/logo/Logo.png" />
+    <link rel="icon" type="image/png" href="../assets/images/logo/logo.png" />
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../assets/css/index.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <!-- JavaScript Files -->
     <script src="../js/util.js" defer></script>
     <script src="../js/render.js" defer></script>
-    <script src="../js/components/header.js" defer></script>
+    <script type="module" src="../js/components/header.js" defer></script>
     <script src="../js/components/footer.js" defer></script>
+    <script type="module" src="../js/components/modals.js" defer></script>
 </head>
 <body>
     <div class="container">
         <div class="wrapper">
             <div id="header"></div>
-            <main>
+            <main class="main-content">
                 <h2>Select Your Role</h2>
                 <div class="role-buttons">
-                    <button id="adminBtn" onclick="selectRole('admin')">Admin</button>
+                    <button id="adminLogin" onclick="selectRole('admin')">Admin</button>
                     <button id="patientBtn" onclick="selectRole('patient')">Patient</button>
-                    <button id="doctorBtn" onclick="selectRole('doctor')">Doctor</button>
+                    <button id="doctorLogin" onclick="selectRole('doctor')">Doctor</button>
                 </div>
             </main>
             <div id="footer"></div>
@@ -37,6 +38,6 @@
             </div>
         </div>
     </div>
-    <script type="module" src="../js/pages/index.js" defer></script>
+    <script type="module" src="../js/services/index.js" defer></script>
 </body>
 </html>

@@ -34,7 +34,7 @@ public class Doctor {
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
     private String phone;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> availableTimes; // e.g., ["09:00-10:00", "10:00-11:00"]
 
     // Constructors

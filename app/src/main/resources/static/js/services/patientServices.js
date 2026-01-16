@@ -42,7 +42,7 @@ export async function patientLogin(data) {
 }
 
 // For getting patient data (name ,id , etc ). Used in booking appointments
-export async function getPatientData(token) {
+export async function fetchPatientDetails(token) {
   try {
     const response = await fetch(`${PATIENT_API}/${token}`);
     const data = await response.json();

@@ -1,6 +1,6 @@
-import { BASE_API_URL } from "../config/config.js";
+import { API_BASE_URL } from "../config/config.js";
 
-const DOCTOR_API = `${BASE_API_URL}/doctor`;
+const DOCTOR_API = `${API_BASE_URL}/doctor`;
 
 export async function getDoctors() {
   try {

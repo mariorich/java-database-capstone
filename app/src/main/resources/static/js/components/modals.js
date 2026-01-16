@@ -40,7 +40,7 @@ export function openModal(type) {
               <label><input type="checkbox" name="availability" value="16:00-17:00"> 4:00 PM - 5:00 PM</label>
           </div>
         </div>
-        <button class="dashboard-btn" id="addDoctorBtn">Save</button>
+        <button class="dashboard-btn" id="saveDoctorBtn">Save</button>
       `;
   } else if (type === 'patientLogin') {
     modalContent = `
