@@ -67,10 +67,10 @@ public class Service {
     @Transactional
     public ResponseEntity<Map<String, String>> validateAdmin(Admin admin) {
         try {
-            Optional<Admin> existingAdmin = adminRepository.findByUsername(admin.getUsername());
+            Optional<Admin> existingAdmin = adminRepository.findByEmail(admin.getEmail());
             if (existingAdmin.isPresent()) {
                 if (existingAdmin.get().getPassword().equals(admin.getPassword())) {
-                    String token = tokenService.generateToken(admin.getUsername());
+                    String token = tokenService.generateToken(admin.getEmail());
                     Map<String, String> response = new HashMap<>();
                     response.put("token", token);
                     return new ResponseEntity<>(response, HttpStatus.OK);
@@ -86,12 +86,12 @@ public class Service {
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> validatePatientLogin(String username, String password) {
+    public ResponseEntity<Map<String, String>> validatePatientLogin(String email, String password) {
         try {
-            Optional<Patient> patient = patientRepository.findByUsername(username);
+            Optional<Patient> patient = patientRepository.findByEmail(email);
             if (patient.isPresent()) {
                 if (patient.get().getPassword().equals(password)) {
-                    String token = tokenService.generateToken(username);
+                    String token = tokenService.generateToken(email);
                     return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(Map.of("error", "Invalid password"), HttpStatus.UNAUTHORIZED);
@@ -105,13 +105,13 @@ public class Service {
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> validateDoctorLogin(String username, String password) {
+    public ResponseEntity<Map<String, String>> validateDoctorLogin(String email, String password) {
         try {
-            Optional<Doctor> doctorOpt = doctorRepository.findByEmail(username);
+            Optional<Doctor> doctorOpt = doctorRepository.findByEmail(email);
             if (doctorOpt.isPresent()) {
                 Doctor doctor = doctorOpt.get();
                 if (doctor.getPassword().equals(password)) {
-                    String token = tokenService.generateToken(username);
+                    String token = tokenService.generateToken(email);
                     return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(Map.of("error", "Invalid password"), HttpStatus.UNAUTHORIZED);

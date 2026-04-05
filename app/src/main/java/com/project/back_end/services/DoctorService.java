@@ -120,15 +120,15 @@ public class DoctorService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> validateDoctor(String username, String password) {
-        Optional<Doctor> doctor = doctorRepository.findByUsername(username);
+    public ResponseEntity<Map<String, Object>> validateDoctor(String email, String password) {
+        Optional<Doctor> doctor = doctorRepository.findByEmail(email);
         if (doctor.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Doctor not found"));
         }
         if (!doctor.get().getPassword().equals(password)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid password"));
         }
-        String token = tokenService.generateToken(doctor.get().getUsername());
+        String token = tokenService.generateToken(doctor.get().getEmail());
         return ResponseEntity.ok(Map.of("token", token, "doctor", doctor));
     }
 
@@ -159,9 +159,9 @@ public class DoctorService {
     }
 
     @Transactional
-    public Map<String, Object> filterDoctorsByNameSpecialityAndTime(String name, String speciality, String amOrPm) {
+    public Map<String, Object> filterDoctorsByNameSpecialtyAndTime(String name, String specialty, String amOrPm) {
         List<Doctor> doctors = doctorRepository
-                .findByNameContainingIgnoreCaseAndSpecialityIgnoreCase(name, speciality);
+                .findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
 
         List<Doctor> filteredDoctors = filterDoctorByTime(doctors, amOrPm);
         return Map.of("doctors", filteredDoctors);
@@ -175,21 +175,21 @@ public class DoctorService {
     }   
 
     @Transactional
-    public Map<String, Object> filterDoctorByNameAndSpeciality(String name, String speciality) {
-        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCaseAndSpecialityIgnoreCase(name, speciality);
+    public Map<String, Object> filterDoctorByNameAndSpecialty(String name, String specialty) {
+        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
         return Map.of("doctors", doctors);
     }
 
     @Transactional
-    public Map<String, Object> filterDoctorByTimeAndSpeciality(String speciality, String amOrPm) {
-        List<Doctor> doctors = doctorRepository.findBySpecialityIgnoreCase(speciality);
+    public Map<String, Object> filterDoctorByTimeAndSpecialty(String specialty, String amOrPm) {
+        List<Doctor> doctors = doctorRepository.findBySpecialtyIgnoreCase(specialty);
         List<Doctor> filteredDoctors = filterDoctorByTime(doctors, amOrPm); 
         return Map.of("doctors", filteredDoctors);
     }
 
     @Transactional
-    public Map<String, Object> filterDoctorBySpeciality(String speciality) {
-        List<Doctor> doctors = doctorRepository.findBySpecialityIgnoreCase(speciality);
+    public Map<String, Object> filterDoctorBySpecialty(String specialty) {
+        List<Doctor> doctors = doctorRepository.findBySpecialtyIgnoreCase(specialty);
         return Map.of("doctors", doctors);
     }
 

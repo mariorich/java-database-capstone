@@ -1,11 +1,13 @@
 package com.project.back_end.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import java.util.List;
 
 @Entity
-@Table(name = "patients")
+@Table(name = "patient")
 public class Patient {
 
     @Id
@@ -33,15 +35,20 @@ public class Patient {
     @Size(max = 255, message = "Address must not exceed 255 characters")
     private String address;
 
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Appointment> appointments;
+
     // Constructors
     public Patient() {
     }
-    public Patient(String name, String email, String password, String phone, String address) {
+    public Patient(String name, String email, String password, String phone, String address, List<Appointment> appointments) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.address = address;
+        this.appointments = appointments;
     }
 
     // Getters and Setters:
@@ -89,4 +96,11 @@ public class Patient {
         this.address = address;
     }
 
+    public List<Appointment> getAppointments(){
+        return appointments;
+    }
+
+    public void setAppointments(List<Appointment> appointments){
+        this.appointments = appointments;
+    }
 }

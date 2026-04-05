@@ -1,12 +1,13 @@
 package com.project.back_end.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.util.List;
 
 @Entity
-@Table(name = "doctors")
+@Table(name = "doctor")
 public class Doctor {
 
     @Id
@@ -37,17 +38,22 @@ public class Doctor {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> availableTimes; // e.g., ["09:00-10:00", "10:00-11:00"]
 
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Appointment> appointments;
+
     // Constructors
     public Doctor() {
     }
 
-    public Doctor(String name, String specialty, String email, String password, String phone, List<String> availableTimes) {
+    public Doctor(String name, String specialty, String email, String password, String phone, List<String> availableTimes, List<Appointment> appointments) {
         this.name = name;
         this.specialty = specialty;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.availableTimes = availableTimes;
+        this.appointments = appointments;
     }
 
     // Getters and Setters:
@@ -101,6 +107,14 @@ public class Doctor {
 
     public void setAvailableTimes(List<String> availableTimes) {
         this.availableTimes = availableTimes;
+    }
+
+    public List<Appointment> getAppointments(){
+        return appointments;
+    }
+
+    public void setAppointments(List<Appointment> appointments){
+        this.appointments = appointments;
     }
 
 }

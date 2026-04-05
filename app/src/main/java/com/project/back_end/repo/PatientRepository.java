@@ -17,5 +17,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     @Query("SELECT p FROM Patient p WHERE p.username = :username")
     Optional<Patient> findByUsername(@Param("username") String username);
 
+
 }
 

@@ -34,19 +34,19 @@ public class TokenService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + 604800000L);
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         try {
             Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(getSigningKey())
@@ -60,18 +60,18 @@ public class TokenService {
 
     public boolean isTokenValid(String token, String userType) {
         try {
-            String username = extractUsername(token);
-            if (username == null) {
+            String email = extractEmail(token);
+            if (email == null) {
                 return false;
             }
 
             switch (userType.toLowerCase()) {
                 case "admin":
-                    return adminRepository.findByEmail(username).isPresent();
+                    return adminRepository.findByEmail(email).isPresent();
                 case "doctor":
-                    return doctorRepository.findByEmail(username).isPresent();
+                    return doctorRepository.findByEmail(email).isPresent();
                 case "patient":
-                    return patientRepository.findByEmail(username).isPresent();
+                    return patientRepository.findByEmail(email).isPresent();
                 default:
                     return false;
             }

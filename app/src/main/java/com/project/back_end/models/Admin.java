@@ -5,15 +5,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
-@Table(name = "admins")
+@Table(name = "admin")
 public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @NotNull(message = "Username cannot be null")
-    private String username;
+    @NotNull(message = "Email cannot be null")
+    @Email(message = "Email should be valid")
+    private String email;
 
     @NotNull(message = "Password cannot be null")
     // Make sure password can only be written (not exposed in JSON)
@@ -24,22 +25,22 @@ public class Admin {
     public Admin() {}
 
     // Custom constructor
-    public Admin(String username, String password) {
-        this.username = username;
+    public Admin(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
     // Getters and Setters
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

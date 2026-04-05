@@ -13,9 +13,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     @Query("SELECT d FROM Doctor d WHERE d.email = :email")
     Optional<Doctor> findByEmail(@Param("email") String email);
 
-    @Query("SELECT d FROM Doctor d WHERE d.username = :username")
-    Optional<Doctor> findByUsername(@Param("username") String username);
-
     @Query("SELECT d FROM Doctor d WHERE d.name LIKE CONCAT('%', :name, '%')")
     List<Doctor> findByNameLike(@Param("name") String name);
 
