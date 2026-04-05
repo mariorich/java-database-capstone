@@ -13,13 +13,16 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     @Query("SELECT d FROM Doctor d WHERE d.email = :email")
     Optional<Doctor> findByEmail(@Param("email") String email);
 
+    @Query("SELECT d FROM Doctor d WHERE d.username = :username")
+    Optional<Doctor> findByUsername(@Param("username") String username);
+
     @Query("SELECT d FROM Doctor d WHERE d.name LIKE CONCAT('%', :name, '%')")
     List<Doctor> findByNameLike(@Param("name") String name);
 
-    @Query("SELECT d FROM Doctor d WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%')) AND LOWER(d.speciality) = LOWER(:speciality)")
-    List<Doctor> findByNameContainingIgnoreCaseAndSpecialityIgnoreCase(@Param("name") String name, @Param("speciality") String speciality);
+    @Query("SELECT d FROM Doctor d WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%')) AND LOWER(d.specialty) = LOWER(:specialty)")
+    List<Doctor> findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(@Param("name") String name, @Param("specialty") String specialty);
 
-    @Query("SELECT d FROM Doctor d WHERE LOWER(d.speciality) = LOWER(:speciality)")
-    List<Doctor> findBySpecialityIgnoreCase(@Param("speciality") String speciality);
+    @Query("SELECT d FROM Doctor d WHERE LOWER(d.speciality) = LOWER(:specialty)")
+    List<Doctor> findBySpecialtyIgnoreCase(@Param("speciality") String specialty);
 
 }

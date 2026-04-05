@@ -120,15 +120,15 @@ public class DoctorService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> validateDoctor(String email, String password) {
-        Optional<Doctor> doctor = doctorRepository.findByEmail(email);
+    public ResponseEntity<Map<String, Object>> validateDoctor(String username, String password) {
+        Optional<Doctor> doctor = doctorRepository.findByUsername(username);
         if (doctor.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Doctor not found"));
         }
         if (!doctor.get().getPassword().equals(password)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid password"));
         }
-        String token = tokenService.generateToken(doctor.get().getEmail());
+        String token = tokenService.generateToken(doctor.get().getUsername());
         return ResponseEntity.ok(Map.of("token", token, "doctor", doctor));
     }
 

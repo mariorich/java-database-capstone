@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
-    @Query("SELECT d FROM Admin d WHERE d.email = :email")
-    public Optional<Admin> findByEmail(@Param("email") String email);
+    @Query("SELECT d FROM Admin d WHERE d.id = :id")
+    public Optional<Admin> findById(@Param("id") long Id );
 
 }
