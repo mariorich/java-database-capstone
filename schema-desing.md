@@ -33,7 +33,7 @@
 | `email` | VARCHAR(100) |  |
 | `phone` | VARCHAR(20) |  |
 | `name` | VARCHAR(100) | NOT NULL |
-| `speciality` | VARCHAR(100) | DEFAULT "General" |
+| `specialty` | VARCHAR(100) | DEFAULT "General" |
 | `register_date` | DATE | NOT NULL |
 
 ---
