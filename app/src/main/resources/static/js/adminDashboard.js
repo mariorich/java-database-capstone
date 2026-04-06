@@ -70,16 +70,17 @@ export function renderDoctorCards(doctors) {
     const card = createDoctorCard(doctor);
     contentDiv.appendChild(card);
   });
-}
+} 
 
-window.adminAddDoctor = async function () {
+window.adminAddDoctor = async function adminAddDoctor() {
   const name = document.getElementById("doctorName").value;
   const email = document.getElementById("doctorEmail").value;
   const phone = document.getElementById("doctorPhone").value;
   const password = document.getElementById("doctorPassword").value;
   const specialty = document.getElementById("doctorSpecialty").value;
-  const availableTimesSelect = document.getElementById("doctorAvailableTimes");
-  const availableTimes = Array.from(availableTimesSelect.selectedOptions).map(option => option.value);
+  const availableTimes = Array.from(
+  document.querySelectorAll('#doctorAvailableTimes input:checked')
+  ).map(cb => cb.value);
 
   const token = localStorage.getItem("token");
   if (!token) {

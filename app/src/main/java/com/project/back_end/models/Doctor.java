@@ -18,8 +18,8 @@ public class Doctor {
     @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters")
     private String name;
 
-    @NotNull(message = "Speciality cannot be null")
-    @Size(min = 3, max = 50, message = "Speciality must be between 3 and 50 characters")
+    @NotNull(message = "Specialty cannot be null")
+    @Size(min = 3, max = 50, message = "Specialty must be between 3 and 50 characters")
     private String specialty;
 
     @NotNull(message = "Email cannot be null")

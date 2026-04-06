@@ -5,7 +5,7 @@ export function openModal(type) {
     modalContent = `
          <h2>Add Doctor</h2>
          <input type="text" id="doctorName" placeholder="Doctor Name" class="input-field">
-         <select id="specialization" class="input-field select-dropdown">
+         <select id="doctorSpecialty" class="input-field select-dropdown">
              <option value="">Specialization</option>
                         <option value="cardiologist">Cardiologist</option>
                         <option value="dermatologist">Dermatologist</option>
@@ -24,7 +24,6 @@ export function openModal(type) {
 
         </select>
         <input type="email" id="doctorEmail" placeholder="Email" class="input-field">
-        <input type="text" id="doctorUsername" placeholder="Username" class="input-field">
         <input type="password" id="doctorPassword" placeholder="Password" class="input-field">
         <input type="text" id="doctorPhone" placeholder="Mobile No." class="input-field">
         <div class="availability-container">
