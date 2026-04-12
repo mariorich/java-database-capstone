@@ -1,4 +1,4 @@
-import { getDoctors, filterDoctors, saveDoctor } from "./services/doctorServices.js";
+import { getDoctors, filterDoctors } from "./services/doctorServices.js";
 import { createDoctorCard } from "./components/doctorCard.js";
 import { openModal } from "./components/modals.js";
 
@@ -72,7 +72,7 @@ export function renderDoctorCards(doctors) {
   });
 } 
 
-window.adminAddDoctor = async function adminAddDoctor() {
+window.adminAddDoctor = async function () {
   const name = document.getElementById("doctorName").value;
   const email = document.getElementById("doctorEmail").value;
   const phone = document.getElementById("doctorPhone").value;
@@ -101,7 +101,7 @@ window.adminAddDoctor = async function adminAddDoctor() {
     const response = await saveDoctor(doctor, token);
     if (response.success) {
       alert("✅ Doctor added successfully.");
-      document.getElementById("modalApp").remove();
+      document.getElementById("modal").remove();
       window.location.reload();
     } else {
       alert("❌ Failed to add doctor: " + response.message);

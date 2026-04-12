@@ -46,19 +46,19 @@ export function renderHeader() {
     `;
   } else if (role === "doctor") {
     headerContent += `
-      <button id="doctorHomeBtn" class="adminBtn">Home</button>
-      <button id="logoutBtn" class="adminBtn">Logout</button>
+      <button id="doctorHomeBtn" class="doctorBtn">Home</button>
+      <button id="logoutBtn" class="doctorBtn">Logout</button>
     `;
   } else if (role === "patient") {
     headerContent += `
-      <button id="patientLogin" class="adminBtn">Login</button>
-      <button id="patientSignup" class="adminBtn">Sign Up</button>
+      <button id="patientLogin" class="patientBtn">Login</button>
+      <button id="patientSignup" class="patientBtn">Sign Up</button>
     `;
   } else if (role === "loggedPatient") {
     headerContent += `
-      <button id="homeBtn" class="adminBtn">Home</button>
-      <button id="patientAppointmentsBtn" class="adminBtn">Appointments</button>
-      <button id="logoutPatientBtn" class="adminBtn">Logout</button>
+      <button id="homeBtn" class="patientBtn">Home</button>
+      <button id="patientAppointmentsBtn" class="patientBtn">Appointments</button>
+      <button id="logoutPatientBtn" class="patientBtn">Logout</button>
     `;
   }
 

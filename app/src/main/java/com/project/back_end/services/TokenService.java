@@ -48,16 +48,21 @@ public class TokenService {
 
     public String extractEmail(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parser()
-                    .setSigningKey(getSigningKey())
+            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
                     .build()
-                    .parseClaimsJws(token);
-            return claimsJws.getBody().getSubject();
-        } catch (JwtException e) {
-            return null; 
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            return claims.getSubject();
+
+        } catch (Exception e) {
+            return null;
         }
     }
-
+    
     public boolean isTokenValid(String token, String userType) {
         try {
             String email = extractEmail(token);

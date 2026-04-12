@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "../config/config.js";
 
 const DOCTOR_API = `${API_BASE_URL}/doctor`;
+const ADMIN_API = `${API_BASE_URL}/admin`;
 
 export async function getDoctors() {
   try {
@@ -14,35 +15,53 @@ export async function getDoctors() {
 }
 
 export async function deleteDoctor(doctorId, token) {
-  try {
-    const response = await fetch(`${DOCTOR_API}/delete/${doctorId}/${token}`, {
-      method: "DELETE",
-    });
-    const data = await response.json();
-    return {
-      success: data.success,
-      message: data.message,
-    };
-  } catch (error) {
-    console.error("Error deleting doctor:", error);
-    return {
-      success: false,
-      message: "An error occurred while deleting the doctor.",
-    };
+    try {
+      const response = await fetch(`${ADMIN_API}/delete/${doctorId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+  
+      const text = await response.text();
+  
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { success: false, message: text };
+      }
+  
+      return data;
+    } catch (error) {
+      console.error("Error deleting doctor:", error);
+      return {
+        success: false,
+        message: "An error occurred while deleting the doctor."
+      };
+    }
   }
-}
 
 export async function saveDoctor(doctor, token) {
   try {
-    const response = await fetch(`${DOCTOR_API}/add/${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(doctor),
+    const response = await fetch(`${ADMIN_API}/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(doctor),
     });
 
-    const data = await response.json();
+    const text = await response.text();
+
+    let data;
+    try {
+    data = JSON.parse(text);
+    } catch {
+    data = { success: false, message: text };
+    }
+
     return {
       success: data.success,
       message: data.message,

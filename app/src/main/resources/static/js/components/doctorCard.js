@@ -6,7 +6,7 @@ export function createDoctorCard(doctor) {
   const card = document.createElement("div");
   card.classList.add("doctor-card");
 
-  const userRole = localStorage.getItem("role");
+  const userRole = localStorage.getItem("userRole");
 
   const doctorInfo = document.createElement("div");
   doctorInfo.classList.add("doctor-info");

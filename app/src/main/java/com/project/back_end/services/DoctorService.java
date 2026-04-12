@@ -62,28 +62,44 @@ public class DoctorService {
 
     @Transactional
     public int saveDoctor(Doctor doctor, String token) {
-        if (!tokenService.isTokenValid(token, "doctor") 
-            || !tokenService.isTokenValid(token, "admin")) {
-            return 0; 
+
+        String cleanToken = token.replace("Bearer ", "");
+
+        if (!tokenService.isTokenValid(cleanToken, "admin")) {
+            return 0;
         }
-        try{
-            Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
-            if(existingDoctor.isPresent()){
-                return -1; 
+
+        try {
+
+            Optional<Doctor> existingDoctor =
+                    doctorRepository.findByEmail(doctor.getEmail());
+
+            if (existingDoctor.isPresent()) {
+                return -1;
             }
+
             doctorRepository.save(doctor);
-            return 1; 
-        }catch(Exception e){
-            return 0; 
+            return 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
-    }   
+    }
 
     @Transactional
     public int updateDoctor(Doctor doctor, String token) {
-        if (!tokenService.isTokenValid(token, "doctor") 
-            || !tokenService.isTokenValid(token, "admin")) {
-            return 0; 
+        
+        String cleanToken = token.replace("Bearer ", "");
+        System.out.println("RAW TOKEN: " + token);
+        System.out.println("CLEAN TOKEN: " + cleanToken);
+        System.out.println("ADMIN VALID: " + tokenService.isTokenValid(cleanToken, "admin"));
+        
+        if (!tokenService.isTokenValid(cleanToken, "admin")
+        && !tokenService.isTokenValid(cleanToken, "doctor")) {
+            return 0;
         }
+
         try{
             Optional<Doctor> existingDoctor = doctorRepository.findById(doctor.getId());
             if(existingDoctor.isEmpty()){
@@ -103,9 +119,15 @@ public class DoctorService {
 
     @Transactional
     public int deleteDoctor(Long doctorId, String token) {
-        if (!tokenService.isTokenValid(token, "doctor") 
-            || !tokenService.isTokenValid(token, "admin")) {
-            return 0; 
+
+        String cleanToken = token.replace("Bearer ", "");
+        System.out.println("RAW TOKEN: " + token);
+        System.out.println("CLEAN TOKEN: " + cleanToken);
+        System.out.println("ADMIN VALID: " + tokenService.isTokenValid(cleanToken, "admin"));
+        
+        if (!tokenService.isTokenValid(cleanToken, "admin")
+        && !tokenService.isTokenValid(cleanToken, "doctor")) {
+            return 0;
         }
         try{
             Optional<Doctor> existingDoctor = doctorRepository.findById(doctorId);

@@ -8,16 +8,16 @@
     <title>Doctor Dashboard</title>
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/adminDashboard.css}">
-    <link rel="stylesheet" th:href="@{/css/doctorDashboard.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/doctorDashboard.css}">
 
     <!-- JavaScript Files -->
     <script th:src="@{/js/render.js}" defer></script>
     <script th:src="@{/js/util.js}" defer></script>
     <script type="module" th:src="@{/js/components/header.js}" defer></script>
-    <script th:src="@{/js/footer.js}" defer></script>
+    <script th:src="@{/js/components/footer.js}" defer></script>
     <script type="module" th:src="@{/js/doctorDashboard.js}" defer></script>
+    <script type="module" th:src="@{/js/services/doctorServices.js}" defer></script>
 </head>
 <body onload="renderContent()">
 

@@ -32,7 +32,7 @@ public class Doctor {
     private String password;
 
     @NotNull(message = "Phone number cannot be null")
-    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
+    @Pattern(regexp = "^[0-9]{9}$", message = "Phone number must be 9 digits")
     private String phone;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -69,7 +69,7 @@ public class Doctor {
         this.name = name;
     }
 
-    public String getSpeciality() {
+    public String getSpecialty() {
         return specialty;
     }
 

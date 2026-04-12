@@ -1,5 +1,5 @@
-import { getAllAppointments } from "../services/appointmentServices.js";
-import { createPatientRow } from "../components/patientRow.js";
+import { getAllAppointments } from "./services/appointmentServices.js";
+import { createPatientRow } from "./components/patientRow.js";
 
 const tableBody = document.getElementById("patientTableBody");
 let selectedDate = new Date().toISOString().split("T")[0]; // Default to today
@@ -14,7 +14,7 @@ document.getElementById("searchBar").addEventListener("input", (e) => {
 });
 
 // "Today" button click listener
-document.getElementById("todayBtn").addEventListener("click", () => {
+document.getElementById("todayButton").addEventListener("click", () => {
   selectedDate = new Date().toISOString().split("T")[0];
   document.getElementById("datePicker").value = selectedDate;
   loadAppointments();
@@ -28,7 +28,8 @@ document.getElementById("datePicker").addEventListener("change", (e) => {
 
 async function loadAppointments() {
   try {
-    const appointments = await getAllAppointments(selectedDate, patientName, token);
+    const data = await getAllAppointments(selectedDate, patientName, token);
+    const appointments = data.appointments;
 
     tableBody.innerHTML = ""; // Clear existing rows
 
