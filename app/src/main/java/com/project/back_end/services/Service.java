@@ -151,7 +151,7 @@ public class Service {
     @Transactional
     public boolean validatePatient(String email, String phoneNumber) {
         Optional<Patient> patient = patientRepository.findByEmailOrPhone(email, phoneNumber);
-        return !patient.isPresent();
+        return patient.isPresent();
     }
 
     public ResponseEntity<Map<String, Object>> filterPatient(String token, String condition, String doctorName) {

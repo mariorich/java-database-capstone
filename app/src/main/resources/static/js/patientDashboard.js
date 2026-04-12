@@ -1,11 +1,14 @@
 // patientDashboard.js
 import { getDoctors } from './services/doctorServices.js';
 import { openModal } from './components/modals.js';
+import { renderHeader } from './components/header.js';
 import { createDoctorCard } from './components/doctorCard.js';
 import { filterDoctors } from './services/doctorServices.js';//call the same function to avoid duplication coz the functionality was same
 import { patientSignup, patientLogin } from './services/patientServices.js';
 
-
+document.addEventListener("DOMContentLoaded", () => {
+  renderHeader();
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDoctorCards();
@@ -105,32 +108,27 @@ window.signupPatient = async function () {
 };
 
 window.loginPatient = async function () {
-  try {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    const data = {
-      email,
-      password
+    try {
+      const email = document.getElementById("patientEmail").value;
+      const password = document.getElementById("patientPassword").value;
+  
+      const data = { email, password };
+  
+      const response = await patientLogin(data);
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result);
+  
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("userRole", "loggedPatient");
+  
+        window.location.href = '/pages/loggedPatientDashboard.html';
+      } else {
+        alert('❌ Invalid credentials!');
+      }
+    } catch (error) {
+      console.log("Error :: loginPatient :: ", error);
+      alert("❌ Failed to Login");
     }
-    console.log("loginPatient :: ", data)
-    const response = await patientLogin(data);
-    console.log("Status Code:", response.status);
-    console.log("Response OK:", response.ok);
-    if (response.ok) {
-      const result = await response.json();
-      console.log(result);
-      selectRole('loggedPatient');
-      localStorage.setItem('token', result.token)
-      window.location.href = '/pages/loggedPatientDashboard.html';
-    } else {
-      alert('❌ Invalid credentials!');
-    }
-  }
-  catch (error) {
-    alert("❌ Failed to Login : ", error);
-    console.log("Error :: loginPatient :: ", error)
-  }
-
-
-}
+  };

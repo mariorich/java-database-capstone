@@ -1,6 +1,7 @@
 import { showBookingOverlay } from "../loggedPatient.js";
 import { deleteDoctor } from "../services/doctorServices.js";
 import { fetchPatientDetails } from "../services/patientServices.js";
+import { openModal } from "./modals.js";
 
 export function createDoctorCard(doctor) {
   const card = document.createElement("div");
@@ -53,7 +54,7 @@ export function createDoctorCard(doctor) {
     });
 
     actionButtons.appendChild(deleteBtn);
-  } else if (userRole === "patient") {
+  } else if (userRole === "patient" || userRole === "loggedPatient") {
     const bookBtn = document.createElement("button");
     bookBtn.textContent = "Book Now";
     bookBtn.classList.add("book-button");
@@ -62,7 +63,7 @@ export function createDoctorCard(doctor) {
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Please log in to book an appointment.");
-        window.location.href = "/login.html";
+        openModal("patientLogin");
         return;
       }
 

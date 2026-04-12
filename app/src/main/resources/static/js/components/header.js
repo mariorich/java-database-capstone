@@ -118,9 +118,10 @@ function logout() {
 }
 
 function logoutPatient() {
-  localStorage.removeItem("token");
-  window.location.href = "/pages/patientDashboard.html";
-}
+    localStorage.removeItem("token");
+    localStorage.removeItem("userRole"); 
+    window.location.href = "/pages/patientDashboard.html";
+  }
 
 // Automatically render the header
 renderHeader();

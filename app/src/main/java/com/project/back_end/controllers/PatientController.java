@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.project.back_end.DTO.Login;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/patient")
@@ -32,14 +33,20 @@ public class PatientController {
     // 4. Create a new patient
     @PostMapping
     public ResponseEntity<?> createPatient(@Valid @RequestBody Patient patient) {
+
         if (service.validatePatient(patient.getEmail(), patient.getPhone())) {
-            return ResponseEntity.status(409).body("Patient already exists");
+            return ResponseEntity.status(409)
+                    .body(Map.of("message", "Patient already exists"));
         }
+
         int result = patientService.createPatient(patient);
+
         if (result == 1) {
-            return ResponseEntity.status(201).body("Patient created successfully");
+            return ResponseEntity.status(201)
+                    .body(Map.of("message", "Patient created successfully"));
         } else {
-            return ResponseEntity.status(500).body("Error creating patient");
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "Error creating patient"));
         }
     }
 
