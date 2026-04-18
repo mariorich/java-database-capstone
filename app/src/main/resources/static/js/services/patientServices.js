@@ -42,7 +42,7 @@ export async function patientLogin(data) {
 }
 
 // For getting patient data (name ,id , etc ). Used in booking appointments
-export async function fetchPatientDetails(token) {
+export async function getPatientDetails(token) {
   try {
     const response = await fetch(`${PATIENT_API}/${token}`);
     const data = await response.json();
@@ -57,9 +57,8 @@ export async function fetchPatientDetails(token) {
 // the Backend API for fetching the patient record(visible in Doctor Dashboard) and Appointments (visible in Patient Dashboard) are same based on user(patient/doctor).
 export async function getPatientAppointments(id, token, user) {
   try {
-    const response = await fetch(`${PATIENT_API}/${id}/${user}/${token}`);
+    const response = await fetch(`${PATIENT_API}/appointments/${id}/${token}/${user}`);
     const data = await response.json();
-    console.log(data.appointments)
     if (response.ok) {
       return data.appointments;
     }
@@ -73,7 +72,7 @@ export async function getPatientAppointments(id, token, user) {
 
 export async function filterAppointments(condition, name, token) {
   try {
-    const response = await fetch(`${PATIENT_API}/filter/${condition}/${name}/${token}`, {
+    const response = await fetch(`${PATIENT_API}/appointments/filter/${condition}/${name}/${token}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

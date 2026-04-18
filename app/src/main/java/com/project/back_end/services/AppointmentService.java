@@ -117,23 +117,59 @@ public class AppointmentService {
         }
     }
 
+    @Transactional
     public Map<String, Object> getAppointment(String pname, String date, String token) {
-        String email = tokenService.extractEmail(token);
-        Optional<Doctor> doctorOpt = doctorRepository.findByEmail(email);
-        Long doctorId = doctorOpt.get().getId();
-        LocalDate localDate = LocalDate.parse(date);
-        List<Appointment> appointments;
-        if (pname != null) {
-            appointments = appointmentRepository.findByDoctorIdAndPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
-                            doctorId, pname, localDate.atStartOfDay(), localDate.atStartOfDay().plusDays(1));
-        } else {
-            appointments = appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(
-                    doctorId, localDate.atStartOfDay(), localDate.atStartOfDay().plusDays(1));
-        }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("appointments", appointments);
-        return response;
+
+        try {
+            // Extract doctor from token
+            String email = tokenService.extractEmail(token);
+            Optional<Doctor> doctorOpt = doctorRepository.findByEmail(email);
+
+            if (doctorOpt.isEmpty()) {
+                response.put("appointments", List.of());
+                return response;
+            }
+
+            Long doctorId = doctorOpt.get().getId();
+
+            // Parse date
+            LocalDate localDate = LocalDate.parse(date);
+
+            // Normalize pname
+            boolean hasNameFilter = pname != null &&
+                    !pname.equalsIgnoreCase("null") &&
+                    !pname.equalsIgnoreCase("all") &&
+                    !pname.trim().isEmpty();
+
+            List<Appointment> appointments;
+
+            if (hasNameFilter) {
+                appointments = appointmentRepository
+                        .findByDoctorIdAndPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
+                                doctorId,
+                                pname,
+                                localDate.atStartOfDay(),
+                                localDate.atStartOfDay().plusDays(1)
+                        );
+            } else {
+                appointments = appointmentRepository
+                        .findByDoctorIdAndAppointmentTimeBetween(
+                                doctorId,
+                                localDate.atStartOfDay(),
+                                localDate.atStartOfDay().plusDays(1)
+                        );
+            }
+
+            response.put("appointments", appointments);
+            return response;
+
+        } catch (Exception e) {
+            response.put("appointments", List.of());
+            response.put("error", "Failed to fetch appointments");
+            return response;
+        }
     }
     
 }

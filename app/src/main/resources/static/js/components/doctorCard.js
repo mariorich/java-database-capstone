@@ -1,6 +1,6 @@
 import { showBookingOverlay } from "../loggedPatient.js";
 import { deleteDoctor } from "../services/doctorServices.js";
-import { fetchPatientDetails } from "../services/patientServices.js";
+import { getPatientDetails } from "../services/patientServices.js";
 import { openModal } from "./modals.js";
 
 export function createDoctorCard(doctor) {
@@ -68,7 +68,7 @@ export function createDoctorCard(doctor) {
       }
 
       try {
-        const patient = await fetchPatientDetails(token);
+        const patient = await getPatientDetails(token);
         showBookingOverlay(e, doctor, patient);
       } catch (error) {
         console.error("Error fetching patient details:", error);

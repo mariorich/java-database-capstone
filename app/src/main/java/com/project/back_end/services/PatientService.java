@@ -44,12 +44,19 @@ public class PatientService {
     public ResponseEntity<Map<String, Object>> getPatientAppointment(Long patientId) {
         try {
             List<Appointment> appointments = appointmentRepository.findByPatientId(patientId);
+
             List<AppointmentDTO> dtoList = appointments.stream()
                     .map(AppointmentDTO::fromEntity)
                     .collect(Collectors.toList());
-            return ResponseEntity.ok().body(Map.of("appointments", dtoList));
+
+            return ResponseEntity.ok(Map.of("appointments", dtoList));
+
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to retrieve appointments"));
+            return ResponseEntity.internalServerError()
+                    .body(Map.of(
+                            "appointments", List.of(),
+                            "error", "Failed to retrieve appointments"
+                    ));
         }
     }
 

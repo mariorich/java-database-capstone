@@ -5,7 +5,9 @@ const APPOINTMENT_API = `${API_BASE_URL}/appointments`;
 
 //This is for the doctor to get all the patient Appointments
 export async function getAllAppointments(date, patientName, token) {
-  const response = await fetch(`${APPOINTMENT_API}/${date}/${patientName}/${token}`);
+  const safeName = patientName ? patientName : "all";
+
+  const response = await fetch(`${APPOINTMENT_API}/${date}/${safeName}/${token}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch appointments");
