@@ -24,7 +24,7 @@ public class AppointmentController {
     }
 
     // 3. Get appointments by date and patient name
-    @GetMapping("/{date}/{patientName}/{token}")
+    @GetMapping("/{patientName}/{date}/{token}")
     public ResponseEntity<?> getAppointments(@PathVariable String date,
                                              @PathVariable String patientName,
                                              @PathVariable String token) {

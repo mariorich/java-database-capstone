@@ -28,7 +28,7 @@ document.getElementById("datePicker").addEventListener("change", (e) => {
 
 async function loadAppointments() {
   try {
-    const data = await getAllAppointments(selectedDate, patientName, token);
+    const data = await getAllAppointments(patientName,selectedDate, token);
     const appointments = data.appointments;
 
     tableBody.innerHTML = ""; // Clear existing rows
@@ -45,7 +45,7 @@ async function loadAppointments() {
         phone: appointment.patientPhone,
         email: appointment.patientEmail
       };
-      const row = createPatientRow(appointment, patient);
+      const row = createPatientRow(patient,appointment.id,appointment.doctorId);
       tableBody.appendChild(row);
     });
   } catch (error) {

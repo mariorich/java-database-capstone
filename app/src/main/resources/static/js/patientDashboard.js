@@ -53,36 +53,36 @@ document.getElementById("filterSpecialty").addEventListener("change", filterDoct
 
 
 function filterDoctorsOnChange() {
-  const searchBar = document.getElementById("searchBar").value.trim();
-  const filterTime = document.getElementById("filterTime").value;
-  const filterSpecialty = document.getElementById("filterSpecialty").value;
-
-
-  const name = searchBar.length > 0 ? searchBar : null;
-  const time = filterTime.length > 0 ? filterTime : null;
-  const specialty = filterSpecialty.length > 0 ? filterSpecialty : null;
-
-  filterDoctors(name, time, specialty)
-    .then(response => {
-      const doctors = response.doctors;
-      const contentDiv = document.getElementById("content");
-      contentDiv.innerHTML = "";
-
-      if (doctors.length > 0) {
-        console.log(doctors);
-        doctors.forEach(doctor => {
-          const card = createDoctorCard(doctor);
-          contentDiv.appendChild(card);
-        });
-      } else {
-        contentDiv.innerHTML = "<p>No doctors found with the given filters.</p>";
-        console.log("Nothing");
-      }
-    })
-    .catch(error => {
-      console.error("Failed to filter doctors:", error);
-      alert("❌ An error occurred while filtering doctors.");
-    });
+    const searchBar = document.getElementById("searchBar").value.trim();
+    const filterTime = document.getElementById("filterTime").value;
+    const filterSpecialty = document.getElementById("filterSpecialty").value;
+  
+    // 🔥 Convert null/empty → "all"
+    const name = searchBar.length > 0 ? searchBar : "all";
+    const time = filterTime.length > 0 ? filterTime : "all";
+    const specialty = filterSpecialty.length > 0 ? filterSpecialty : "all";
+  
+    console.log("FILTER CALL:", name, time, specialty); // debug
+  
+    filterDoctors(name, time, specialty)
+      .then(response => {
+        const doctors = response.doctors;
+        const contentDiv = document.getElementById("content");
+        contentDiv.innerHTML = "";
+  
+        if (doctors.length > 0) {
+          doctors.forEach(doctor => {
+            const card = createDoctorCard(doctor);
+            contentDiv.appendChild(card);
+          });
+        } else {
+          contentDiv.innerHTML = "<p>No doctors found with the given filters.</p>";
+        }
+      })
+      .catch(error => {
+        console.error("Failed to filter doctors:", error);
+        alert("❌ An error occurred while filtering doctors.");
+      });
 }
 
 window.signupPatient = async function () {

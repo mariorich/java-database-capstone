@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.stream.Collectors;
+import com.project.back_end.DTO.AppointmentDTO;
 
 @Component
 public class AppointmentService {
@@ -162,7 +164,11 @@ public class AppointmentService {
                         );
             }
 
-            response.put("appointments", appointments);
+            List<AppointmentDTO> dtoList = appointments.stream()
+                    .map(AppointmentDTO::fromEntity)
+                    .collect(Collectors.toList());
+
+            response.put("appointments", dtoList);
             return response;
 
         } catch (Exception e) {

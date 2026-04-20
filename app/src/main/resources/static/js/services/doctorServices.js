@@ -77,20 +77,25 @@ export async function saveDoctor(doctor, token) {
 
 export async function filterDoctors(name, time, specialty) {
   try {
+    const safeName = name && name !== "null" ? name : "all";
+    const safeTime = time && time !== "null" ? time : "all";
+    const safeSpecialty = specialty && specialty !== "null" ? specialty : "all";
+
+    console.log("FINAL URL:", `${DOCTOR_API}/filter/${safeName}/${safeTime}/${safeSpecialty}`);
+
     const response = await fetch(
-      `${DOCTOR_API}/filter/${name}/${time}/${specialty}`
+      `${DOCTOR_API}/filter/${safeName}/${safeTime}/${safeSpecialty}`
     );
 
     if (response.ok) {
-      const data = await response.json();
-      return data;
+      return await response.json();
     } else {
       console.error("Error filtering doctors:", response.statusText);
       return { doctors: [] };
     }
   } catch (error) {
     console.error("Error filtering doctors:", error);
-    alert("An error occurred while filtering doctors. Please try again later.");
+    alert("An error occurred while filtering doctors.");
     return { doctors: [] };
   }
 }

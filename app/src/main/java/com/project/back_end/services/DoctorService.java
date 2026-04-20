@@ -182,11 +182,20 @@ public class DoctorService {
 
     @Transactional
     public Map<String, Object> filterDoctorsByNameSpecialtyAndTime(String name, String specialty, String amOrPm) {
-        List<Doctor> doctors = doctorRepository
-                .findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
 
-        List<Doctor> filteredDoctors = filterDoctorByTime(doctors, amOrPm);
-        return Map.of("doctors", filteredDoctors);
+        List<Doctor> doctors;
+        if ("all".equalsIgnoreCase(specialty)) {
+            doctors = doctorRepository.findByNameLike(name);
+        } else {
+            doctors = doctorRepository
+                .findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
+        }
+
+        if (!"all".equalsIgnoreCase(amOrPm)) {
+            doctors = filterDoctorByTime(doctors, amOrPm);
+        }
+
+        return Map.of("doctors", doctors);
     }   
 
     @Transactional
